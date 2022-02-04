@@ -40,6 +40,15 @@
   name: "size/XL"
 
 # Modules
-# - color: "fbca04"
-#   description: "This issue or pull request is related to access-workgroup module."
-#   name: ":floppy_disk: athena-workgroup"
+- color: "fbca04"
+  description: "This issue or pull request is related to alb-target-group module."
+  name: ":floppy_disk: alb-target-group"
+- color: "fbca04"
+  description: "This issue or pull request is related to instance-target-group module."
+  name: ":floppy_disk: instance-target-group"
+- color: "fbca04"
+  description: "This issue or pull request is related to ip-target-group module."
+  name: ":floppy_disk: ip-target-group"
+- color: "fbca04"
+  description: "This issue or pull request is related to lambda-target-group module."
+  name: ":floppy_disk: lambda-target-group"
