@@ -17,25 +17,25 @@ locals {
 
 # INFO: Not supported attributes
 # - `connection_termination`
-# - `lambda_multi_value_headers_enabled`
+# - `deregistration_delay`
 # - `load_balancing_algorithm_type`
+# - `preserve_client_ip`
+# - `protocol`
 # - `protocol_version`
 # - `proxy_protocol_v2`
+# - `port`
 # - `slow_start`
+# - `vpc_id`
 resource "aws_lb_target_group" "this" {
   name = var.name
 
-  vpc_id = var.vpc_id
-
-  target_type = "alb"
-  protocol    = "TCP"
-  port        = var.port
+  target_type = "lambda"
 
   ## Attributes
-  ## INFO: Not supported to edit
-  # deregistration_delay = 300
-  # preserve_client_ip = true
-  # stickiness
+  lambda_multi_value_headers_enabled = var.multi_value_headers_enabled
+  # stickiness {
+  #   enabled = true
+  # }
 
   # health_check
 
@@ -50,16 +50,37 @@ resource "aws_lb_target_group" "this" {
 
 
 ###################################################
-# Attachment for ALB Target Group
+# Attachment for Lambda Target Group
 ###################################################
 
 # INFO: Not supported attributes
-# - `availability_zone`
+# - `port`
 resource "aws_lb_target_group_attachment" "this" {
-  count = var.target_alb != null ? 1 : 0
+  count = var.target_lambda != null ? 1 : 0
 
+  # TODO: divide function name and alias
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id = var.target_alb
-  port      = var.port
+  target_id         = var.target_lambda
+  availability_zone = "all"
+
+  depends_on = [
+    aws_lambda_permission.this,
+  ]
+}
+
+
+###################################################
+# Permission for Lambda Target Group
+###################################################
+
+resource "aws_lambda_permission" "this" {
+  count = var.target_lambda != null ? 1 : 0
+
+  function_name = var.target_lambda
+
+  statement_id_prefix = "AllowExecutionFromALB-"
+  principal           = "elasticloadbalancing.amazonaws.com"
+  action              = "lambda:InvokeFunction"
+  source_arn          = aws_lb_target_group.this.arn
 }
