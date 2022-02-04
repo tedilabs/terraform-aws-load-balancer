@@ -1,3 +1,9 @@
 # Modules
-# ":floppy_disk: athena-workgroup":
-# - modules/athena-workgroup/**/*
+":floppy_disk: alb-target-group":
+- modules/alb-target-group/**/*
+":floppy_disk: instance-target-group":
+- modules/instance-target-group/**/*
+":floppy_disk: ip-target-group":
+- modules/ip-target-group/**/*
+":floppy_disk: lambda-target-group":
+- modules/lambda-target-group/**/*
