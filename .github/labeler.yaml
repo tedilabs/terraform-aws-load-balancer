@@ -1,6 +1,10 @@
 # Modules
+":floppy_disk: alb":
+- modules/alb/**/*
 ":floppy_disk: nlb":
 - modules/nlb/**/*
+":floppy_disk: gwlb":
+- modules/gwlb/**/*
 ":floppy_disk: alb-target-group":
 - modules/alb-target-group/**/*
 ":floppy_disk: instance-target-group":
