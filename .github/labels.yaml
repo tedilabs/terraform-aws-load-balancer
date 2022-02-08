@@ -41,6 +41,9 @@
 
 # Modules
 - color: "fbca04"
+  description: "This issue or pull request is related to nlb module."
+  name: ":floppy_disk: nlb"
+- color: "fbca04"
   description: "This issue or pull request is related to alb-target-group module."
   name: ":floppy_disk: alb-target-group"
 - color: "fbca04"
