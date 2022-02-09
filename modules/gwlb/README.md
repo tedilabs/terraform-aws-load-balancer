@@ -3,6 +3,7 @@
 This module creates following resources.
 
 - `aws_lb`
+- `aws_lb_listener` (optional)
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -27,8 +28,10 @@ No modules.
 | Name | Type |
 |------|------|
 | [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_lb_listener.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_resourcegroups_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/resourcegroups_group) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_lb_target_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/lb_target_group) | data source |
 | [aws_subnet.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 
 ## Inputs
@@ -44,6 +47,7 @@ No modules.
 | <a name="input_resource_group_enabled"></a> [resource\_group\_enabled](#input\_resource\_group\_enabled) | (Optional) Whether to create Resource Group to find and group AWS resources which are created by this module. | `bool` | `true` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources. | `map(string)` | `{}` | no |
+| <a name="input_target_group_arn"></a> [target\_group\_arn](#input\_target\_group\_arn) | (Optional) The ARN of the Target Group to which to route traffic. | `string` | `null` | no |
 
 ## Outputs
 
@@ -51,15 +55,14 @@ No modules.
 |------|-------------|
 | <a name="output_arn"></a> [arn](#output\_arn) | The Amazon Resource Name (ARN) of the load balancer. |
 | <a name="output_arn_suffix"></a> [arn\_suffix](#output\_arn\_suffix) | The ARN suffix for use with CloudWatch Metrics. |
+| <a name="output_attributes"></a> [attributes](#output\_attributes) | Load Balancer Attributes that applied to the gateway load balancer. |
 | <a name="output_availability_zone_ids"></a> [availability\_zone\_ids](#output\_availability\_zone\_ids) | A list of the Availability Zone IDs which are used by the load balancer. |
 | <a name="output_available_availability_zone_ids"></a> [available\_availability\_zone\_ids](#output\_available\_availability\_zone\_ids) | A list of the Availability Zone IDs available to the current account and region. |
-| <a name="output_cross_zone_load_balancing_enabled"></a> [cross\_zone\_load\_balancing\_enabled](#output\_cross\_zone\_load\_balancing\_enabled) | Indicates whether to enable cross-zone load balancing. |
-| <a name="output_deletion_protection_enabled"></a> [deletion\_protection\_enabled](#output\_deletion\_protection\_enabled) | Indicates whether deletion of the load balancer via the AWS API will be protected. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the load balancer. |
+| <a name="output_listeners"></a> [listeners](#output\_listeners) | Listeners of the load balancer. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the load balancer. |
 | <a name="output_network_mapping"></a> [network\_mapping](#output\_network\_mapping) | The configuration for the load balancer how routes traffic to targets in which subnets and IP address settings. |
 | <a name="output_subnets"></a> [subnets](#output\_subnets) | A list of subnet IDs attached to the load balancer. |
 | <a name="output_type"></a> [type](#output\_type) | The type of the load balancer. Always return `GATEWAY` |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The VPC ID of the load balancer. |
-| <a name="output_zzzzzzz"></a> [zzzzzzz](#output\_zzzzzzz) | Indicates whether deletion of the load balancer via the AWS API will be protected. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

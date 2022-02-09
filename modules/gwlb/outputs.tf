@@ -48,17 +48,31 @@ output "network_mapping" {
   value       = local.network_mapping
 }
 
-output "cross_zone_load_balancing_enabled" {
-  description = "Indicates whether to enable cross-zone load balancing."
-  value       = aws_lb.this.enable_cross_zone_load_balancing
+output "attributes" {
+  description = "Load Balancer Attributes that applied to the gateway load balancer."
+  value = {
+    cross_zone_load_balancing_enabled = aws_lb.this.enable_cross_zone_load_balancing
+    deletion_protection_enabled       = aws_lb.this.enable_deletion_protection
+  }
 }
 
-output "deletion_protection_enabled" {
-  description = "Indicates whether deletion of the load balancer via the AWS API will be protected."
-  value       = aws_lb.this.enable_deletion_protection
-}
+output "listeners" {
+  description = "Listeners of the load balancer."
+  value = var.target_group_arn != null ? {
+    "GENEVE:6081" = {
+      id  = one(aws_lb_listener.this.*.id)
+      arn = one(aws_lb_listener.this.*.arn)
 
-output "zzzzzzz" {
-  description = "Indicates whether deletion of the load balancer via the AWS API will be protected."
-  value       = aws_lb.this
+      protocol = "GENEVE"
+      port     = "6081"
+
+      type = "forward"
+      target_group = {
+        arn      = var.target_group_arn
+        name     = one(data.aws_lb_target_group.this.*.name)
+        protocol = one(data.aws_lb_target_group.this.*.protocol)
+        port     = one(data.aws_lb_target_group.this.*.port)
+      }
+    }
+  } : {}
 }
