@@ -29,6 +29,12 @@ variable "deletion_protection_enabled" {
   default     = false
 }
 
+variable "target_group_arn" {
+  description = "(Optional) The ARN of the Target Group to which to route traffic."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "(Optional) A map of tags to add to all resources."
   type        = map(string)
