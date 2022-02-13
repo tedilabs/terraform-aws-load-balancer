@@ -47,7 +47,7 @@ No modules.
 | <a name="input_resource_group_enabled"></a> [resource\_group\_enabled](#input\_resource\_group\_enabled) | (Optional) Whether to create Resource Group to find and group AWS resources which are created by this module. | `bool` | `true` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources. | `map(string)` | `{}` | no |
-| <a name="input_target_group_arn"></a> [target\_group\_arn](#input\_target\_group\_arn) | (Optional) The ARN of the Target Group to which to route traffic. | `string` | `null` | no |
+| <a name="input_target_group"></a> [target\_group](#input\_target\_group) | (Optional) The ARN of the target group to which to route traffic. | `string` | `null` | no |
 
 ## Outputs
 
@@ -63,6 +63,6 @@ No modules.
 | <a name="output_name"></a> [name](#output\_name) | The name of the load balancer. |
 | <a name="output_network_mapping"></a> [network\_mapping](#output\_network\_mapping) | The configuration for the load balancer how routes traffic to targets in which subnets and IP address settings. |
 | <a name="output_subnets"></a> [subnets](#output\_subnets) | A list of subnet IDs attached to the load balancer. |
-| <a name="output_type"></a> [type](#output\_type) | The type of the load balancer. Always return `GATEWAY` |
+| <a name="output_type"></a> [type](#output\_type) | The type of the load balancer. Always return `GATEWAY`. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The VPC ID of the load balancer. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
