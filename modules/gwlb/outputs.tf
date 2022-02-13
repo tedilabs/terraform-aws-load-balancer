@@ -19,7 +19,7 @@ output "name" {
 }
 
 output "type" {
-  description = "The type of the load balancer. Always return `GATEWAY`"
+  description = "The type of the load balancer. Always return `GATEWAY`."
   value       = local.load_balancer_type
 }
 
@@ -58,20 +58,21 @@ output "attributes" {
 
 output "listeners" {
   description = "Listeners of the load balancer."
-  value = var.target_group_arn != null ? {
-    "GENEVE:6081" = {
-      id  = one(aws_lb_listener.this.*.id)
-      arn = one(aws_lb_listener.this.*.arn)
+  value = var.target_group != null ? {
+    6081 = {
+      id   = one(aws_lb_listener.this.*.id)
+      arn  = one(aws_lb_listener.this.*.arn)
+      name = "${var.name}/GENEVE:6081"
 
-      protocol = "GENEVE"
       port     = "6081"
+      protocol = "GENEVE"
 
       type = "forward"
       target_group = {
-        arn      = var.target_group_arn
+        arn      = var.target_group
         name     = one(data.aws_lb_target_group.this.*.name)
-        protocol = one(data.aws_lb_target_group.this.*.protocol)
         port     = one(data.aws_lb_target_group.this.*.port)
+        protocol = one(data.aws_lb_target_group.this.*.protocol)
       }
     }
   } : {}

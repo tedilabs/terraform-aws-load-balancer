@@ -29,8 +29,8 @@ variable "deletion_protection_enabled" {
   default     = false
 }
 
-variable "target_group_arn" {
-  description = "(Optional) The ARN of the Target Group to which to route traffic."
+variable "target_group" {
+  description = "(Optional) The ARN of the target group to which to route traffic."
   type        = string
   default     = null
 }
