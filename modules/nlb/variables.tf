@@ -44,13 +44,13 @@ variable "access_log_enabled" {
 }
 
 variable "access_log_s3_bucket" {
-  description = "The name of the S3 bucket used to store the access logs."
+  description = "(Optional) The name of the S3 bucket used to store the access logs."
   type        = string
   default     = null
 }
 
 variable "access_log_s3_key_prefix" {
-  description = "The key prefix for the specified S3 bucket."
+  description = "(Optional) The key prefix for the specified S3 bucket."
   type        = string
   default     = null
 }
@@ -65,6 +65,21 @@ variable "deletion_protection_enabled" {
   description = "(Optional) Indicates whether deletion of the load balancer via the AWS API will be protected. Defaults to `false`."
   type        = bool
   default     = false
+}
+
+variable "listeners" {
+  description = <<EOF
+  (Optional) A list of listener configurations of the network load balancer. Listeners listen for connection requests using their `protocol` and `port`. Each value of `listener` block as defined below.
+    (Required) `port` - The number of port on which the listener of load balancer is listening.
+    (Required) `protocol` - The protocol for connections from clients to the load balancer. Valid values are `TCP`, `TLS`, `UDP` and `TCP_UDP`. Not valid to use `UDP` or `TCP_UDP` if dual-stack mode is enabled on the load balancer.
+    (Required) `target_group` - The ARN of the target group to which to route traffic.
+    (Optional) `tls_certificate` - The ARN of the default SSL server certificate. For adding additional SSL certificates, see the `tls_additional_certificates` variable. Required if `protocol` is `TLS`.
+    (Optional) `tls_additional_certificates` - A set of ARNs of the certificate to attach to the listener. This is for additional certificates and does not replace the default certificate on the listener.
+    (Optional) `tls_security_policy` - The name of security policy for a Secure Socket Layer (SSL) negotiation configuration. This is used to negotiate SSL connections with clients. Required if protocol is `TLS`. Recommend using the `ELBSecurityPolicy-TLS13-1-2-2021-06` security policy. This security policy includes TLS 1.3, which is optimized for security and performance, and is backward compatible with TLS 1.2.
+    (Optional) `tls_alpn_policy` - The policy of the Application-Layer Protocol Negotiation (ALPN) to select. ALPN is a TLS extension that includes the protocol negotiation within the exchange of hello messages. Can be set if `protocol` is `TLS`. Valid values are `HTTP1Only`, `HTTP2Only`, `HTTP2Optional`, `HTTP2Preferred`, and `None`. Defaults to `None`.
+  EOF
+  type        = any
+  default     = []
 }
 
 variable "tags" {

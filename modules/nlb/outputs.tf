@@ -19,7 +19,7 @@ output "name" {
 }
 
 output "type" {
-  description = "The type of the load balancer. Always return `NETWORK`"
+  description = "The type of the load balancer. Always return `NETWORK`."
   value       = local.load_balancer_type
 }
 
@@ -85,4 +85,9 @@ output "cross_zone_load_balancing_enabled" {
 output "deletion_protection_enabled" {
   description = "Indicates whether deletion of the load balancer via the AWS API will be protected."
   value       = aws_lb.this.enable_deletion_protection
+}
+
+output "listeners" {
+  description = "The listeners of the network load balancer."
+  value       = module.listener
 }

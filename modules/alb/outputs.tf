@@ -19,7 +19,7 @@ output "name" {
 }
 
 output "type" {
-  description = "The type of the load balancer. Always return `APPLICATION`"
+  description = "The type of the load balancer. Always return `APPLICATION`."
   value       = local.load_balancer_type
 }
 

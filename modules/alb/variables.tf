@@ -52,13 +52,13 @@ variable "access_log_enabled" {
 }
 
 variable "access_log_s3_bucket" {
-  description = "The name of the S3 bucket used to store the access logs."
+  description = "(Optional) The name of the S3 bucket used to store the access logs."
   type        = string
   default     = null
 }
 
 variable "access_log_s3_key_prefix" {
-  description = "The key prefix for the specified S3 bucket."
+  description = "(Optional) The key prefix for the specified S3 bucket."
   type        = string
   default     = null
 }

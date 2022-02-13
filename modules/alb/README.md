@@ -37,8 +37,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_name"></a> [name](#input\_name) | (Required) The name of the load balancer. This name must be unique within your AWS account, can have a maximum of 32 characters, must contain only alphanumeric characters or hyphens, and must not begin or end with a hyphen. | `string` | n/a | yes |
 | <a name="input_access_log_enabled"></a> [access\_log\_enabled](#input\_access\_log\_enabled) | (Optional) Indicates whether to enable access logs. Defaults to `false`, even when bucket is specified. | `bool` | `false` | no |
-| <a name="input_access_log_s3_bucket"></a> [access\_log\_s3\_bucket](#input\_access\_log\_s3\_bucket) | The name of the S3 bucket used to store the access logs. | `string` | `null` | no |
-| <a name="input_access_log_s3_key_prefix"></a> [access\_log\_s3\_key\_prefix](#input\_access\_log\_s3\_key\_prefix) | The key prefix for the specified S3 bucket. | `string` | `null` | no |
+| <a name="input_access_log_s3_bucket"></a> [access\_log\_s3\_bucket](#input\_access\_log\_s3\_bucket) | (Optional) The name of the S3 bucket used to store the access logs. | `string` | `null` | no |
+| <a name="input_access_log_s3_key_prefix"></a> [access\_log\_s3\_key\_prefix](#input\_access\_log\_s3\_key\_prefix) | (Optional) The key prefix for the specified S3 bucket. | `string` | `null` | no |
 | <a name="input_deletion_protection_enabled"></a> [deletion\_protection\_enabled](#input\_deletion\_protection\_enabled) | (Optional) Indicates whether deletion of the load balancer via the AWS API will be protected. Defaults to `false`. | `bool` | `false` | no |
 | <a name="input_desync_mitigation_mode"></a> [desync\_mitigation\_mode](#input\_desync\_mitigation\_mode) | (Optional) Determines how the load balancer handles requests that might pose a security risk to your application. Valid values are `DEFENSIVE`, `STRICTEST` and `MONITOR`. Defaults to `DEFENSIVE`. | `string` | `"DEFENSIVE"` | no |
 | <a name="input_drop_invalid_header_fields"></a> [drop\_invalid\_header\_fields](#input\_drop\_invalid\_header\_fields) | (Optional) Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). Elastic Load Balancing requires that message header names contain only alphanumeric characters and hyphens. Defaults to `false`. | `bool` | `false` | no |
@@ -73,7 +73,7 @@ No modules.
 | <a name="output_network_mapping"></a> [network\_mapping](#output\_network\_mapping) | The configuration for the load balancer how routes traffic to targets in which subnets and IP address settings. |
 | <a name="output_security_groups"></a> [security\_groups](#output\_security\_groups) | A set of security group IDs which is assigned to the load balancer. |
 | <a name="output_subnets"></a> [subnets](#output\_subnets) | A list of subnet IDs attached to the load balancer. |
-| <a name="output_type"></a> [type](#output\_type) | The type of the load balancer. Always return `APPLICATION` |
+| <a name="output_type"></a> [type](#output\_type) | The type of the load balancer. Always return `APPLICATION`. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The VPC ID of the load balancer. |
 | <a name="output_zone_id"></a> [zone\_id](#output\_zone\_id) | The canonical hosted zone ID of the load balancer to be used in a Route 53 Alias record. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
