@@ -96,3 +96,37 @@ resource "aws_lb" "this" {
     var.tags,
   )
 }
+
+
+###################################################
+# Listeners for Network Load Balancer
+###################################################
+
+module "listener" {
+  source = "../nlb-listener"
+
+  for_each = {
+    for listener in var.listeners :
+    listener.port => listener
+  }
+
+  load_balancer = aws_lb.this.arn
+
+  port         = each.key
+  protocol     = each.value.protocol
+  target_group = each.value.target_group
+
+  ## TLS
+  tls_certificate             = try(each.value.tls_certificate, null)
+  tls_additional_certificates = try(each.value.tls_additional_certificates, [])
+  tls_security_policy         = try(each.value.tls_security_policy, "ELBSecurityPolicy-TLS13-1-2-2021-06")
+  tls_alpn_policy             = try(each.value.tls_alpn_policy, "None")
+
+  resource_group_enabled = false
+  module_tags_enabled    = false
+
+  tags = merge(
+    local.module_tags,
+    var.tags,
+  )
+}
