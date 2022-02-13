@@ -5,6 +5,10 @@
 - modules/nlb/**/*
 ":floppy_disk: gwlb":
 - modules/gwlb/**/*
+":floppy_disk: alb-listener":
+- modules/alb-listener/**/*
+":floppy_disk: nlb-listener":
+- modules/nlb-listener/**/*
 ":floppy_disk: alb-target-group":
 - modules/alb-target-group/**/*
 ":floppy_disk: instance-target-group":
