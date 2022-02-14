@@ -93,3 +93,8 @@ output "attributes" {
     idle_timeout                = aws_lb.this.idle_timeout
   }
 }
+
+output "listeners" {
+  description = "The listeners of the application load balancer."
+  value       = module.listener
+}

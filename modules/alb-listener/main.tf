@@ -25,7 +25,7 @@ data "aws_lb_target_group" "this" {
 
 locals {
   load_balancer_name = data.aws_lb.this.name
-  tls_enabled        = var.protocol == "TLS"
+  tls_enabled        = var.protocol == "HTTPS"
 }
 
 resource "aws_lb_listener" "this" {
@@ -37,7 +37,6 @@ resource "aws_lb_listener" "this" {
   ## TLS
   certificate_arn = local.tls_enabled ? var.tls_certificate : null
   ssl_policy      = local.tls_enabled ? var.tls_security_policy : null
-  alpn_policy     = local.tls_enabled ? var.tls_alpn_policy : null
 
   default_action {
     type             = "forward"

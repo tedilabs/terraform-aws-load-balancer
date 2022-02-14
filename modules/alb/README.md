@@ -3,6 +3,9 @@
 This module creates following resources.
 
 - `aws_lb`
+- `aws_lb_listener` (optional)
+- `aws_lb_listener_certificate` (optional)
+- `aws_lb_listener_rule` (optional)
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -16,11 +19,13 @@ This module creates following resources.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.67.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.0.0 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_listener"></a> [listener](#module\_listener) | ../alb-listener | n/a |
 
 ## Resources
 
@@ -46,6 +51,7 @@ No modules.
 | <a name="input_idle_timeout"></a> [idle\_timeout](#input\_idle\_timeout) | (Optional) The number of seconds before the load balancer determines the connection is idle and closes it. Defaults to `60` | `number` | `60` | no |
 | <a name="input_ip_address_type"></a> [ip\_address\_type](#input\_ip\_address\_type) | (Optional) The type of IP addresses used by the subnets for your load balancer. The possible values are `IPV4` and `DUALSTACK`. | `string` | `"IPV4"` | no |
 | <a name="input_is_public"></a> [is\_public](#input\_is\_public) | (Optional) Indicates whether the load balancer will be public. Defaults to `false`. | `bool` | `false` | no |
+| <a name="input_listeners"></a> [listeners](#input\_listeners) | (Optional) A list of listener configurations of the application load balancer. Listeners listen for connection requests using their `protocol` and `port`. Each value of `listener` block as defined below.<br>    (Required) `port` - The number of port on which the listener of load balancer is listening.<br>    (Required) `protocol` - The protocol for connections from clients to the load balancer. Valid values are `HTTP` and `HTTPS`.<br>    (Required) `target_group` - The ARN of the target group to which to route traffic.<br>    (Optional) `tls_certificate` - The ARN of the default SSL server certificate. For adding additional SSL certificates, see the `tls_additional_certificates` variable. Required if `protocol` is `HTTPS`.<br>    (Optional) `tls_additional_certificates` - A set of ARNs of the certificate to attach to the listener. This is for additional certificates and does not replace the default certificate on the listener.<br>    (Optional) `tls_security_policy` - The name of security policy for a Secure Socket Layer (SSL) negotiation configuration. This is used to negotiate SSL connections with clients. Required if protocol is `HTTPS`. Defaults to `ELBSecurityPolicy-2016-08` security policy. The `ELBSecurityPolicy-2016-08` security policy is always used for backend connections. Application Load Balancers do not support custom security policies. | `any` | `[]` | no |
 | <a name="input_module_tags_enabled"></a> [module\_tags\_enabled](#input\_module\_tags\_enabled) | (Optional) Whether to create AWS Resource Tags for the module informations. | `bool` | `true` | no |
 | <a name="input_network_mapping"></a> [network\_mapping](#input\_network\_mapping) | (Optional) The configuration for the load balancer how routes traffic to targets in which subnets, and in accordance with IP address settings. Select at least two Availability Zone and one subnet for each zone. The load balancer will route traffic only to targets in the selected Availability Zones. Zones that are not supported by the load balancer or VPC cannot be selected. Subnets can be added, but not removed, once a load balancer is created. Each key of `network_mapping` is the availability zone id like `apne2-az1`, `use1-az1`. Each value of `network_mapping` block as defined below.<br>    (Required) `subnet_id` - The id of the subnet of which to attach to the load balancer. You can specify only one subnet per Availability Zone. | `map(map(string))` | `{}` | no |
 | <a name="input_resource_group_description"></a> [resource\_group\_description](#input\_resource\_group\_description) | (Optional) The description of Resource Group. | `string` | `"Managed by Terraform."` | no |
@@ -69,6 +75,7 @@ No modules.
 | <a name="output_id"></a> [id](#output\_id) | The ID of the load balancer. |
 | <a name="output_ip_address_type"></a> [ip\_address\_type](#output\_ip\_address\_type) | The type of IP addresses used by the subnets for your load balancer. |
 | <a name="output_is_public"></a> [is\_public](#output\_is\_public) | Indicates whether the load balancer is public. |
+| <a name="output_listeners"></a> [listeners](#output\_listeners) | The listeners of the application load balancer. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the load balancer. |
 | <a name="output_network_mapping"></a> [network\_mapping](#output\_network\_mapping) | The configuration for the load balancer how routes traffic to targets in which subnets and IP address settings. |
 | <a name="output_security_groups"></a> [security\_groups](#output\_security\_groups) | A set of security group IDs which is assigned to the load balancer. |
