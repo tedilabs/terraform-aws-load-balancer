@@ -43,6 +43,7 @@ resource "aws_lb_listener" "this" {
     type             = "forward"
     target_group_arn = var.target_group
   }
+
   tags = merge(
     {
       "Name" = local.metadata.name

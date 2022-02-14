@@ -77,14 +77,12 @@ output "access_log" {
   }
 }
 
-output "cross_zone_load_balancing_enabled" {
-  description = "Indicates whether to enable cross-zone load balancing."
-  value       = aws_lb.this.enable_cross_zone_load_balancing
-}
-
-output "deletion_protection_enabled" {
-  description = "Indicates whether deletion of the load balancer via the AWS API will be protected."
-  value       = aws_lb.this.enable_deletion_protection
+output "attributes" {
+  description = "Load Balancer Attributes that applied to the network load balancer."
+  value = {
+    cross_zone_load_balancing_enabled = aws_lb.this.enable_cross_zone_load_balancing
+    deletion_protection_enabled       = aws_lb.this.enable_deletion_protection
+  }
 }
 
 output "listeners" {

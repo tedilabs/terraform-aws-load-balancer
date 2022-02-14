@@ -62,10 +62,9 @@ This module creates following resources.
 | <a name="output_access_log"></a> [access\_log](#output\_access\_log) | The configuration for access logs of the load balancer. |
 | <a name="output_arn"></a> [arn](#output\_arn) | The Amazon Resource Name (ARN) of the load balancer. |
 | <a name="output_arn_suffix"></a> [arn\_suffix](#output\_arn\_suffix) | The ARN suffix for use with CloudWatch Metrics. |
+| <a name="output_attributes"></a> [attributes](#output\_attributes) | Load Balancer Attributes that applied to the network load balancer. |
 | <a name="output_availability_zone_ids"></a> [availability\_zone\_ids](#output\_availability\_zone\_ids) | A list of the Availability Zone IDs which are used by the load balancer. |
 | <a name="output_available_availability_zone_ids"></a> [available\_availability\_zone\_ids](#output\_available\_availability\_zone\_ids) | A list of the Availability Zone IDs available to the current account and region. |
-| <a name="output_cross_zone_load_balancing_enabled"></a> [cross\_zone\_load\_balancing\_enabled](#output\_cross\_zone\_load\_balancing\_enabled) | Indicates whether to enable cross-zone load balancing. |
-| <a name="output_deletion_protection_enabled"></a> [deletion\_protection\_enabled](#output\_deletion\_protection\_enabled) | Indicates whether deletion of the load balancer via the AWS API will be protected. |
 | <a name="output_domain"></a> [domain](#output\_domain) | The DNS name of the load balancer. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the load balancer. |
 | <a name="output_ip_address_type"></a> [ip\_address\_type](#output\_ip\_address\_type) | The type of IP addresses used by the subnets for your load balancer. |
