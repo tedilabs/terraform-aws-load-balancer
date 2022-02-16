@@ -49,9 +49,12 @@ output "targets" {
 }
 
 output "attributes" {
-  description = "Attributes of the Instance target group of gateway load balancer."
+  description = "Attributes of the Instance target group of network load balancer."
   value = {
-    deregistration_delay = aws_lb_target_group.this.deregistration_delay
+    terminate_connection_on_deregistration = aws_lb_target_group.this.connection_termination
+    deregistration_delay                   = aws_lb_target_group.this.deregistration_delay
+    preserve_client_ip                     = aws_lb_target_group.this.preserve_client_ip
+    proxy_protocol_v2                      = aws_lb_target_group.this.proxy_protocol_v2
   }
 }
 
@@ -69,4 +72,10 @@ output "health_check" {
     success_codes = aws_lb_target_group.this.health_check[0].matcher
     path          = aws_lb_target_group.this.health_check[0].path
   }
+}
+
+output "zzzz" {
+  value = [
+    aws_lb_target_group.this.stickiness,
+  ]
 }

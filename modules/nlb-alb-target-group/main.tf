@@ -28,8 +28,8 @@ resource "aws_lb_target_group" "this" {
   vpc_id = var.vpc_id
 
   target_type = "alb"
-  protocol    = "TCP"
   port        = var.port
+  protocol    = "TCP"
 
   ## Attributes
   ## INFO: Not supported to edit

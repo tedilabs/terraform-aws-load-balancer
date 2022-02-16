@@ -14,55 +14,30 @@ locals {
   } : {}
 }
 
-data "aws_vpc" "this" {
-  id = var.vpc_id
-}
-
-locals {
-  ipv4_regex = "^(\\d+).(\\d+).(\\d+).(\\d+)$"
-
-  ipv4_vpc_cidrs = data.aws_vpc.this.cidr_block_associations.*.cidr_block
-  ipv6_vpc_cidrs = [data.aws_vpc.this.ipv6_cidr_block]
-
-  port = 6081
-  targets = [
-    for target in var.targets : {
-      ip_address = target.ip_address
-      port       = local.port
-      az = anytrue([
-        for cidr in(length(regexall(local.ipv4_regex, target.ip_address)) > 0 ? local.ipv4_vpc_cidrs : local.ipv6_vpc_cidrs) :
-        cidr == cidrsubnet(format("%s/%s", target.ip_address, split("/", cidr)[1]), 0, 0)
-      ]) ? null : "all"
-    }
-  ]
-}
 
 # INFO: Not supported attributes
-# - `connection_termination`
 # - `lambda_multi_value_headers_enabled`
 # - `load_balancing_algorithm_type`
-# - `preserve_client_ip`
 # - `protocol_version`
-# - `proxy_protocol_v2`
 # - `slow_start`
-# - `stickiness`
-# - `tags`
 resource "aws_lb_target_group" "this" {
   name = var.name
 
   vpc_id = var.vpc_id
 
-  target_type = "ip"
-  port        = local.port
-  protocol    = "GENEVE"
+  target_type = "instance"
+  port        = var.port
+  protocol    = var.protocol
 
   ## Attributes
-  deregistration_delay = var.deregistration_delay
+  connection_termination = var.terminate_connection_on_deregistration
+  deregistration_delay   = var.deregistration_delay
+  preserve_client_ip     = var.preserve_client_ip
+  proxy_protocol_v2      = var.proxy_protocol_v2
+  # - `stickiness`
 
-  ## INFO: Too many bugs in terraform provider
-  # - `healthy_threshold` doesn't need to be same with `unhealthy_threashold`
-  # - `interval` doesn't apply to the acutal resource
-  # - `timeout` is not supported
+  ## INFO: Not supported attributes
+  # - `timeout`
   dynamic "health_check" {
     for_each = [merge(
       var.health_check,
@@ -71,8 +46,6 @@ resource "aws_lb_target_group" "this" {
         success_codes = "200-399"
       }
       : {
-        interval      = null
-        timeout       = null
         success_codes = null
         path          = null
       },
@@ -81,43 +54,42 @@ resource "aws_lb_target_group" "this" {
     content {
       enabled = true
 
-      port     = try(health_check.value.port, local.port)
+      port     = try(health_check.value.port, var.port)
       protocol = try(health_check.value.protocol, "TCP")
 
       healthy_threshold   = try(health_check.value.healthy_threshold, 3)
       unhealthy_threshold = try(health_check.value.unhealthy_threshold, 3)
       interval            = try(health_check.value.interval, 30)
-      timeout             = try(health_check.value.timeout, 10)
 
       matcher = health_check.value.success_codes
       path    = try(health_check.value.path, "/")
     }
   }
 
-  # INFO: Not supported on creation time. Only available on modification time.
   tags = merge(
-    # {
-    #   "Name" = local.metadata.name
-    # },
-    # local.module_tags,
+    {
+      "Name" = local.metadata.name
+    },
+    local.module_tags,
     var.tags,
   )
 }
 
 
 ###################################################
-# Attachment for GWLB IP Target Group
+# Attachment for GWLB Instance Target Group
 ###################################################
 
+# INFO: Not supported attributes
+# - `availability_zone`
 resource "aws_lb_target_group_attachment" "this" {
   for_each = {
-    for target in local.targets :
-    target.ip_address => target
+    for target in var.targets :
+    target.instance => target
   }
 
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id         = each.key
-  port              = each.value.port
-  availability_zone = each.value.az
+  target_id = each.key
+  port      = try(each.value.port, var.port)
 }
