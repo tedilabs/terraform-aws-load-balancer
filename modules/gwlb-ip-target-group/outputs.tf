@@ -50,7 +50,7 @@ output "targets" {
 }
 
 output "attributes" {
-  description = "Target Group Attributes that applied to the gateway load balancer."
+  description = "Attributes of the IP target group of gateway load balancer."
   value = {
     deregistration_delay = aws_lb_target_group.this.deregistration_delay
   }

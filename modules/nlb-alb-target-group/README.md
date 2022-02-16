@@ -1,4 +1,4 @@
-# alb-target-group
+# nlb-alb-target-group
 
 This module creates following resources.
 
@@ -51,6 +51,7 @@ No modules.
 |------|-------------|
 | <a name="output_arn"></a> [arn](#output\_arn) | The Amazon Resource Name (ARN) of the target group. |
 | <a name="output_arn_suffix"></a> [arn\_suffix](#output\_arn\_suffix) | The ARN suffix for use with CloudWatch Metrics. |
+| <a name="output_attributes"></a> [attributes](#output\_attributes) | Attributes of the ALB target group of network load balancer. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the target group. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |
 | <a name="output_port"></a> [port](#output\_port) | The port number on which the target receive trrafic. |

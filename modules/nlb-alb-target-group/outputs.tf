@@ -18,19 +18,36 @@ output "name" {
   value       = aws_lb_target_group.this.name
 }
 
+output "vpc_id" {
+  description = "The ID of the VPC which the target group belongs to."
+  value       = aws_lb_target_group.this.vpc_id
+}
+
 output "type" {
   description = "The target type of the target group."
   value       = upper(aws_lb_target_group.this.target_type)
 }
 
-output "target_lambda" {
-  description = "The Amazon Resource Name (ARN) of the target Lambda."
+output "protocol" {
+  description = "The protocl to use to connect with the target."
+  value       = aws_lb_target_group.this.protocol
+}
+
+output "port" {
+  description = "The port number on which the target receive trrafic."
+  value       = aws_lb_target_group.this.port
+}
+
+output "target_alb" {
+  description = "The Amazon Resource Name (ARN) of the target ALB."
   value       = one(aws_lb_target_group_attachment.this.*.target_id)
 }
 
-output "multi_value_headers_enabled" {
-  description = "Indicates whether the request and response headers that are exchanged between the load balancer and the Lambda function include arrays of values or strings."
-  value       = aws_lb_target_group.this.lambda_multi_value_headers_enabled
+output "attributes" {
+  description = "Attributes of the ALB target group of network load balancer."
+  value = {
+    deregistration_delay = aws_lb_target_group.this.deregistration_delay
+  }
 }
 
 output "test" {
