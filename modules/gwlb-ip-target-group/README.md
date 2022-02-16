@@ -52,7 +52,7 @@ No modules.
 |------|-------------|
 | <a name="output_arn"></a> [arn](#output\_arn) | The Amazon Resource Name (ARN) of the target group. |
 | <a name="output_arn_suffix"></a> [arn\_suffix](#output\_arn\_suffix) | The ARN suffix for use with CloudWatch Metrics. |
-| <a name="output_attributes"></a> [attributes](#output\_attributes) | Target Group Attributes that applied to the gateway load balancer. |
+| <a name="output_attributes"></a> [attributes](#output\_attributes) | Attributes of the IP target group of gateway load balancer. |
 | <a name="output_health_check"></a> [health\_check](#output\_health\_check) | Health Check configuration of the target group. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the target group. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |

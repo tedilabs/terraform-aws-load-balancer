@@ -1,4 +1,4 @@
-# lambda-target-group
+# alb-lambda-target-group
 
 This module creates following resources.
 
@@ -52,8 +52,8 @@ No modules.
 |------|-------------|
 | <a name="output_arn"></a> [arn](#output\_arn) | The Amazon Resource Name (ARN) of the target group. |
 | <a name="output_arn_suffix"></a> [arn\_suffix](#output\_arn\_suffix) | The ARN suffix for use with CloudWatch Metrics. |
+| <a name="output_attributes"></a> [attributes](#output\_attributes) | Attributes of the Lambda target group of application load balancer. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the target group. |
-| <a name="output_multi_value_headers_enabled"></a> [multi\_value\_headers\_enabled](#output\_multi\_value\_headers\_enabled) | Indicates whether the request and response headers that are exchanged between the load balancer and the Lambda function include arrays of values or strings. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |
 | <a name="output_target_lambda"></a> [target\_lambda](#output\_target\_lambda) | The Amazon Resource Name (ARN) of the target Lambda. |
 | <a name="output_test"></a> [test](#output\_test) | The port number on which target alb receive trrafic. |
