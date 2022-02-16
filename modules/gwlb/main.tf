@@ -93,18 +93,24 @@ resource "aws_lb" "this" {
 # - `ssl_policy`
 # - `tags`
 resource "aws_lb_listener" "this" {
-  count = var.target_group != null ? 1 : 0
+  for_each = {
+    for listener in var.listeners :
+    listener.port => listener
+  }
 
   load_balancer_arn = aws_lb.this.arn
 
   default_action {
     type             = "forward"
-    target_group_arn = var.target_group
+    target_group_arn = each.value.target_group
   }
 }
 
 data "aws_lb_target_group" "this" {
-  count = var.target_group != null ? 1 : 0
+  for_each = {
+    for listener in var.listeners :
+    listener.port => listener
+  }
 
-  arn = var.target_group
+  arn = each.value.target_group
 }
