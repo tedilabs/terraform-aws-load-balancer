@@ -19,20 +19,11 @@ data "aws_vpc" "this" {
 }
 
 locals {
-  ipv4_regex = "^(\\d+).(\\d+).(\\d+).(\\d+)$"
-
-  ipv4_vpc_cidrs = data.aws_vpc.this.cidr_block_associations.*.cidr_block
-  ipv6_vpc_cidrs = [data.aws_vpc.this.ipv6_cidr_block]
-
   port = 6081
   targets = [
     for target in var.targets : {
-      ip_address = target.ip_address
-      port       = local.port
-      az = anytrue([
-        for cidr in(length(regexall(local.ipv4_regex, target.ip_address)) > 0 ? local.ipv4_vpc_cidrs : local.ipv6_vpc_cidrs) :
-        cidr == cidrsubnet(format("%s/%s", target.ip_address, split("/", cidr)[1]), 0, 0)
-      ]) ? null : "all"
+      instance = target.instance
+      port     = local.port
     }
   ]
 }
@@ -52,7 +43,7 @@ resource "aws_lb_target_group" "this" {
 
   vpc_id = var.vpc_id
 
-  target_type = "ip"
+  target_type = "instance"
   protocol    = "GENEVE"
   port        = local.port
 
@@ -105,18 +96,19 @@ resource "aws_lb_target_group" "this" {
 
 
 ###################################################
-# Attachment for GWLB IP Target Group
+# Attachment for GWLB Instance Target Group
 ###################################################
 
+# INFO: Not supported attributes
+# - `availability_zone`
 resource "aws_lb_target_group_attachment" "this" {
   for_each = {
     for target in local.targets :
-    target.ip_address => target
+    target.instance => target
   }
 
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id         = each.key
-  port              = each.value.port
-  availability_zone = each.value.az
+  target_id = each.key
+  port      = each.value.port
 }

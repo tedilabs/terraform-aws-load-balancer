@@ -38,23 +38,35 @@ output "port" {
   value       = aws_lb_target_group.this.port
 }
 
-output "target_alb" {
-  description = "The Amazon Resource Name (ARN) of the target ALB."
-  value       = one(aws_lb_target_group_attachment.this.*.target_id)
+output "targets" {
+  description = "A set of targets in the target group."
+  value = [
+    for target in aws_lb_target_group_attachment.this : {
+      instance = target.target_id
+      port     = target.port
+    }
+  ]
 }
 
 output "attributes" {
-  description = "Attributes of the ALB target group of network load balancer."
+  description = "Attributes of the Instance target group of gateway load balancer."
   value = {
     deregistration_delay = aws_lb_target_group.this.deregistration_delay
   }
 }
 
-output "test" {
-  description = "The port number on which target alb receive trrafic."
+output "health_check" {
+  description = "Health Check configuration of the target group."
   value = {
-    for key, value in aws_lb_target_group.this :
-    key => value
-    if !contains(["arn", "arn_suffix", "vpc_id", "target_type", "port", "protocol", "tags", "tags_all", "deregistration_delay", "lambda_multi_value_headers_enabled", "preserve_client_ip", "id", "name", "connection_termination", "load_balancing_algorithm_type", "name_prefix", "protocol_version", "proxy_protocol_v2", "slow_start"], key)
+    protocol = aws_lb_target_group.this.health_check[0].protocol
+    port     = aws_lb_target_group.this.health_check[0].port
+
+    healthy_threshold   = aws_lb_target_group.this.health_check[0].healthy_threshold
+    unhealthy_threshold = aws_lb_target_group.this.health_check[0].unhealthy_threshold
+    interval            = aws_lb_target_group.this.health_check[0].interval
+    timeout             = aws_lb_target_group.this.health_check[0].timeout
+
+    success_codes = aws_lb_target_group.this.health_check[0].matcher
+    path          = aws_lb_target_group.this.health_check[0].path
   }
 }
