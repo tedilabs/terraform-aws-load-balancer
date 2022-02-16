@@ -1,4 +1,4 @@
-# gwlb-ip-target-group
+# gwlb-instance-target-group
 
 This module creates following resources.
 
@@ -45,7 +45,7 @@ No modules.
 | <a name="input_resource_group_enabled"></a> [resource\_group\_enabled](#input\_resource\_group\_enabled) | (Optional) Whether to create Resource Group to find and group AWS resources which are created by this module. | `bool` | `true` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources. | `map(string)` | `{}` | no |
-| <a name="input_targets"></a> [targets](#input\_targets) | (Optional) A set of targets to add to the target group. Each value of `targets` block as defined below.<br>    (Required) `ip_address` - Specify IP addresses from the subnets of the virtual private cloud (VPC) for the target group, the RFC 1918 range (10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16), and the RFC 6598 range (100.64.0.0/10). You can't specify publicly routable IP addresses. Support also IPv6 addresses. | <pre>set(object({<br>    ip_address = string<br>  }))</pre> | `[]` | no |
+| <a name="input_targets"></a> [targets](#input\_targets) | (Optional) A set of targets to add to the target group. Each value of `targets` block as defined below.<br>    (Required) `instance` - This is the Instance ID for an instance, or the container ID for an ECS container. | <pre>set(object({<br>    instance = string<br>  }))</pre> | `[]` | no |
 
 ## Outputs
 
@@ -53,7 +53,7 @@ No modules.
 |------|-------------|
 | <a name="output_arn"></a> [arn](#output\_arn) | The Amazon Resource Name (ARN) of the target group. |
 | <a name="output_arn_suffix"></a> [arn\_suffix](#output\_arn\_suffix) | The ARN suffix for use with CloudWatch Metrics. |
-| <a name="output_attributes"></a> [attributes](#output\_attributes) | Attributes of the IP target group of gateway load balancer. |
+| <a name="output_attributes"></a> [attributes](#output\_attributes) | Attributes of the Instance target group of gateway load balancer. |
 | <a name="output_health_check"></a> [health\_check](#output\_health\_check) | Health Check configuration of the target group. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the target group. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |

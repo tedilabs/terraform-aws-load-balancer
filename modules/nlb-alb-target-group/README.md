@@ -55,7 +55,7 @@ No modules.
 | <a name="output_id"></a> [id](#output\_id) | The ID of the target group. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |
 | <a name="output_port"></a> [port](#output\_port) | The port number on which the target receive trrafic. |
-| <a name="output_protocol"></a> [protocol](#output\_protocol) | The protocl to use to connect with the target. |
+| <a name="output_protocol"></a> [protocol](#output\_protocol) | The protocol to use to connect with the target. |
 | <a name="output_target_alb"></a> [target\_alb](#output\_target\_alb) | The Amazon Resource Name (ARN) of the target ALB. |
 | <a name="output_test"></a> [test](#output\_test) | The port number on which target alb receive trrafic. |
 | <a name="output_type"></a> [type](#output\_type) | The target type of the target group. |

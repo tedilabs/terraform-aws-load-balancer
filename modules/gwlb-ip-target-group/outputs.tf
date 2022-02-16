@@ -29,7 +29,7 @@ output "type" {
 }
 
 output "protocol" {
-  description = "The protocl to use to connect with the target."
+  description = "The protocol to use to connect with the target."
   value       = aws_lb_target_group.this.protocol
 }
 
