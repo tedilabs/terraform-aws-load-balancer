@@ -85,11 +85,12 @@ resource "aws_lb_target_group" "this" {
     }
   }
 
+  # INFO: Not supported on creation time. Only available on modification time.
   tags = merge(
-    {
-      "Name" = local.metadata.name
-    },
-    local.module_tags,
+    # {
+    #   "Name" = local.metadata.name
+    # },
+    # local.module_tags,
     var.tags,
   )
 }
