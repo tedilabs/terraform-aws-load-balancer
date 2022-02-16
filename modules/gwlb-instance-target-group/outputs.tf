@@ -28,14 +28,14 @@ output "type" {
   value       = upper(aws_lb_target_group.this.target_type)
 }
 
-output "protocol" {
-  description = "The protocol to use to connect with the target."
-  value       = aws_lb_target_group.this.protocol
-}
-
 output "port" {
   description = "The port number on which the target receive trrafic."
   value       = aws_lb_target_group.this.port
+}
+
+output "protocol" {
+  description = "The protocol to use to connect with the target."
+  value       = aws_lb_target_group.this.protocol
 }
 
 output "targets" {

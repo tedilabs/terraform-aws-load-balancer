@@ -53,8 +53,8 @@ resource "aws_lb_target_group" "this" {
   vpc_id = var.vpc_id
 
   target_type = "ip"
-  protocol    = "GENEVE"
   port        = local.port
+  protocol    = "GENEVE"
 
   ## Attributes
   deregistration_delay = var.deregistration_delay
