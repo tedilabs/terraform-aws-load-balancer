@@ -39,7 +39,7 @@ variable "protocol" {
 variable "targets" {
   description = <<EOF
   (Optional) A set of targets to add to the target group. Each value of `targets` block as defined below.
-    (Required) `instance` - This is the Instance ID for an instance, or the container ID for an ECS container.
+    (Required) `ip_address` - Specify IP addresses from the subnets of the virtual private cloud (VPC) for the target group, the RFC 1918 range (10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16), and the RFC 6598 range (100.64.0.0/10). You can't specify publicly routable IP addresses. Support also IPv6 addresses.
     (Optional) `port` - The port on which targets receive traffic.
   EOF
   type        = set(map(string))
