@@ -14,6 +14,27 @@ locals {
   } : {}
 }
 
+data "aws_vpc" "this" {
+  id = var.vpc_id
+}
+
+locals {
+  ipv4_regex = "^(\\d+).(\\d+).(\\d+).(\\d+)$"
+
+  ipv4_vpc_cidrs = data.aws_vpc.this.cidr_block_associations.*.cidr_block
+  ipv6_vpc_cidrs = [data.aws_vpc.this.ipv6_cidr_block]
+
+  targets = [
+    for target in var.targets : {
+      ip_address = target.ip_address
+      port       = try(target.port, var.port)
+      az = anytrue([
+        for cidr in(length(regexall(local.ipv4_regex, target.ip_address)) > 0 ? local.ipv4_vpc_cidrs : local.ipv6_vpc_cidrs) :
+        cidr == cidrsubnet(format("%s/%s", target.ip_address, split("/", cidr)[1]), 0, 0)
+      ]) ? null : "all"
+    }
+  ]
+}
 
 # INFO: Not supported attributes
 # - `lambda_multi_value_headers_enabled`
@@ -25,7 +46,7 @@ resource "aws_lb_target_group" "this" {
 
   vpc_id = var.vpc_id
 
-  target_type = "instance"
+  target_type = "ip"
   port        = var.port
   protocol    = var.protocol
 
@@ -77,19 +98,18 @@ resource "aws_lb_target_group" "this" {
 
 
 ###################################################
-# Attachment for NLB Instance Target Group
+# Attachment for NLB IP Target Group
 ###################################################
 
-# INFO: Not supported attributes
-# - `availability_zone`
 resource "aws_lb_target_group_attachment" "this" {
   for_each = {
-    for target in var.targets :
-    target.instance => target
+    for target in local.targets :
+    target.ip_address => target
   }
 
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id = each.key
-  port      = try(each.value.port, var.port)
+  target_id         = each.key
+  port              = each.value.port
+  availability_zone = each.value.az
 }
