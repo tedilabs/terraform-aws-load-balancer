@@ -35,9 +35,24 @@ resource "aws_lb_target_group" "this" {
   ## INFO: Not supported to edit
   # deregistration_delay = 300
   # preserve_client_ip = true
-  # stickiness
+  # stickiness {
+  # }
 
-  # health_check
+  ## INFO: Not supported attributes
+  # - `timeout`
+  health_check {
+    enabled = true
+
+    port     = try(var.health_check.port, var.port)
+    protocol = try(var.health_check.protocol, "HTTP")
+
+    healthy_threshold   = try(var.health_check.healthy_threshold, 3)
+    unhealthy_threshold = try(var.health_check.unhealthy_threshold, 3)
+    interval            = try(var.health_check.interval, 30)
+
+    matcher = "200-399"
+    path    = try(var.health_check.path, "/")
+  }
 
   tags = merge(
     {
@@ -50,16 +65,19 @@ resource "aws_lb_target_group" "this" {
 
 
 ###################################################
-# Attachment for ALB Target Group
+# Attachment for NLB ALB Target Group
 ###################################################
 
 # INFO: Not supported attributes
 # - `availability_zone`
 resource "aws_lb_target_group_attachment" "this" {
-  count = var.target_alb != null ? 1 : 0
+  for_each = {
+    for target in var.targets :
+    target.alb => target
+  }
 
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id = var.target_alb
+  target_id = each.value.alb
   port      = var.port
 }
