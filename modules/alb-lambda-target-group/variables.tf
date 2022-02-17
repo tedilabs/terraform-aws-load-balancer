@@ -1,6 +1,11 @@
 variable "name" {
   description = "(Required) Name of the target group."
   type        = string
+
+  validation {
+    condition     = length(var.name) <= 32
+    error_message = "The name can have a maximum of 32 characters, must contain only alphanumeric characters or hyphens, and must not begin or end with a hyphen."
+  }
 }
 
 variable "target_lambda" {

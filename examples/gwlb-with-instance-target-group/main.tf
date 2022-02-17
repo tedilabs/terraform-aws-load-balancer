@@ -21,7 +21,7 @@ data "aws_subnet" "default" {
 
 module "gwlb" {
   source  = "tedilabs/load-balancer/aws//modules/gwlb"
-  version = "~> 0.1.0"
+  version = "~> 0.2.0"
 
   name = "tedilabs-gwlb-instance"
   network_mapping = {
@@ -31,6 +31,7 @@ module "gwlb" {
     }
   }
 
+  ## Attributes
   cross_zone_load_balancing_enabled = true
   deletion_protection_enabled       = false
 
@@ -51,7 +52,7 @@ module "gwlb" {
 
 module "target_group" {
   source  = "tedilabs/load-balancer/aws//modules/gwlb-instance-target-group"
-  version = "~> 0.1.0"
+  version = "~> 0.2.0"
 
   name = "tedilabs-gwlb-instance-tg"
 
