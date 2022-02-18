@@ -74,7 +74,6 @@ variable "desync_mitigation_mode" {
   }
 }
 
-
 variable "drop_invalid_header_fields" {
   description = "(Optional) Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). Elastic Load Balancing requires that message header names contain only alphanumeric characters and hyphens. Defaults to `false`."
   type        = bool
