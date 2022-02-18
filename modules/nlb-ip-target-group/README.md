@@ -67,5 +67,4 @@ No modules.
 | <a name="output_targets"></a> [targets](#output\_targets) | A set of targets in the target group. |
 | <a name="output_type"></a> [type](#output\_type) | The target type of the target group. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC which the target group belongs to. |
-| <a name="output_zzzz"></a> [zzzz](#output\_zzzz) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -56,6 +56,7 @@ output "attributes" {
     deregistration_delay                   = aws_lb_target_group.this.deregistration_delay
     preserve_client_ip                     = aws_lb_target_group.this.preserve_client_ip
     proxy_protocol_v2                      = aws_lb_target_group.this.proxy_protocol_v2
+    stickiness                             = aws_lb_target_group.this.stickiness[0]
   }
 }
 
@@ -73,10 +74,4 @@ output "health_check" {
     success_codes = aws_lb_target_group.this.health_check[0].matcher
     path          = aws_lb_target_group.this.health_check[0].path
   }
-}
-
-output "zzzz" {
-  value = [
-    aws_lb_target_group.this.stickiness,
-  ]
 }

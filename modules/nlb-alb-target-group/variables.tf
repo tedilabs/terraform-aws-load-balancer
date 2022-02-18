@@ -63,7 +63,8 @@ variable "health_check" {
       try(var.health_check.healthy_threshold, 3) >= 2,
       try(var.health_check.unhealthy_threshold, 3) <= 10,
       try(var.health_check.unhealthy_threshold, 3) >= 2,
-      contains([10, 30], try(var.health_check.interval, 30))
+      contains([10, 30], try(var.health_check.interval, 30)),
+      length(try(var.health_check.path, "/")) <= 1024,
     ])
     error_message = "Not valid parameters for `health_check`."
   }

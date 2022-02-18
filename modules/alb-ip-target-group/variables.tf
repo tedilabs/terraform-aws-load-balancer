@@ -27,12 +27,23 @@ variable "port" {
 }
 
 variable "protocol" {
-  description = "(Required) The protocol to use for routing traffic to the targets. Valid values are `TCP`, `TLS`, `UDP` and `TCP_UDP`. Not valid to use `UDP` or `TCP_UDP` if dual-stack mode is enabled on the load balancer."
+  description = "(Required) The protocol to use for routing traffic to the targets. Valid values are `HTTP` and `HTTPS`. Defaults to `HTTP`."
   type        = string
 
   validation {
-    condition     = contains(["TCP", "TLS", "UDP", "TCP_UDP"], var.protocol)
-    error_message = "Valid values are `TCP`, `TLS`, `UDP` and `TCP_UDP`."
+    condition     = contains(["HTTP", "HTTPS"], var.protocol)
+    error_message = "Valid values are `HTTP` and `HTTPS`."
+  }
+}
+
+variable "protocol_version" {
+  description = "(Optional) Use `HTTP1` to send requests to targets using HTTP/1.1. Supported when the request protocol is HTTP/1.1 or HTTP/2. Use `HTTP2` to send requests to targets using HTTP/2. Supported when the request protocol is HTTP/2 or gRPC, but gRPC-specific features are not available. Use `GRPC` to send requests to targets using gRPC. Supported when the request protocol is gRPC. Defaults to `HTTP1`."
+  type        = string
+  default     = "HTTP1"
+
+  validation {
+    condition     = contains(["HTTP1", "HTTP2", "GRPC"], var.protocol_version)
+    error_message = "Valid values are `HTTP1`, `HTTP2` and `GRPC`."
   }
 }
 
@@ -46,12 +57,6 @@ variable "targets" {
   default     = []
 }
 
-variable "terminate_connection_on_deregistration" {
-  description = "(Optional) Whether to terminate active connections at the end of the deregistration timeout is reached on Network Load Balancers. Enabling this setting is particularly important for `UDP` and `TCP_UDP` target groups. Defaults to `false`."
-  type        = bool
-  default     = false
-}
-
 variable "deregistration_delay" {
   description = "(Optional) The time to wait for in-flight requests to complete while deregistering a target. During this time, the state of the target is draining."
   type        = number
@@ -63,27 +68,40 @@ variable "deregistration_delay" {
   }
 }
 
-variable "preserve_client_ip" {
-  description = "(Optional) Whether to preserve client IP addresses and ports in the packets forwarded to targets. Client IP preservation cannot be disabled if the target group protocol is `UDP` and `TCP_UDP`. Defaults to `true`."
-  type        = bool
-  default     = true
+variable "load_balancing_algorithm" {
+  description = "(Optional) Determines how the load balancer selects targets when routing requests. Valid values are `ROUND_ROBIN` or `LEAST_OUTSTANDING_REQUESTS`. Defaults to `ROUND_ROBIN`."
+  type        = string
+  default     = "ROUND_ROBIN"
+
+  validation {
+    condition     = contains(["ROUND_ROBIN", "LEAST_OUTSTANDING_REQUESTS"], var.load_balancing_algorithm)
+    error_message = "Valid values are `ROUND_ROBIN` and `LEAST_OUTSTANDING_REQUESTS`."
+  }
 }
 
-variable "proxy_protocol_v2" {
-  description = "(Optional) Whether to enable support for proxy protocol v2 on Network Load Balancers. Before you enable proxy protocol v2, make sure that your application targets can process proxy protocol headers otherwise your application might break. Defaults to `false`."
-  type        = bool
-  default     = false
+variable "slow_start_duration" {
+  description = "(Optional) The amount time for a newly registered targets to warm up before the load balancer sends them a full share of requests. During this period, targets receives an increasing share of requests until it reaches its fair share. Requires `30` to `900` seconds to enable, or `0` seconds to disable. This attribute cannot be combined with the Least outstanding requests algorithm."
+  type        = number
+  default     = 0
+
+  validation {
+    condition = anytrue([
+      var.slow_start_duration == 0,
+      var.slow_start_duration <= 900 && var.slow_start_duration >= 30
+    ])
+    error_message = "Requires `30` to `900` seconds to enable, or `0` seconds to disable. This attribute cannot be combined with the Least outstanding requests algorithm."
+  }
 }
 
 variable "health_check" {
   description = <<EOF
   (Optional) Health Check configuration block. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.
     (Optional) `port` - The port the load balancer uses when performing health checks on targets. The default is the port on which each target receives traffic from the load balancer. Valid values are either ports 1-65535.
-    (Optional) `protocol` - Protocol to use to connect with the target. The possible values are `TCP`, `HTTP` and `HTTPS`. Defaults to `TCP`.
-    (Optional) `healthy_threshold` - The number of consecutive health checks successes required before considering an unhealthy target healthy. Valid value range is 2 - 10. Defaults to `3`.
-    (Optional) `unhealthy_threshold` - The number of consecutive health check failures required before considering a target unhealthy. Valid value range is 2 - 10. Defaults to `3`.
-    (Optional) `interval` - Approximate amount of time, in seconds, between health checks of an individual target. Valid value range is 5 - 300. Defaults to `10`.
-    (Optional) `timeout` - The amount of time, in seconds, during which no response means a failed health check. Valid value range is 2 - 120. Defaults to `6` when the `protocol` is `HTTP`, and `10` when the `protocol` is `TCP` or `HTTPS`.
+    (Optional) `protocol` - Protocol to use to connect with the target. The possible values are `HTTP` and `HTTPS`. Defaults to `HTTP`.
+    (Optional) `healthy_threshold` - The number of consecutive health checks successes required before considering an unhealthy target healthy. Valid value range is 2 - 10. Defaults to `5`.
+    (Optional) `unhealthy_threshold` - The number of consecutive health check failures required before considering a target unhealthy. Valid value range is 2 - 10. Defaults to `2`.
+    (Optional) `interval` - Approximate amount of time, in seconds, between health checks of an individual target. Valid value range is 5 - 300. Defaults to `30`.
+    (Optional) `timeout` - The amount of time, in seconds, during which no response means a failed health check. Valid value range is 2 - 120. Defaults to `5`.
     (Optional) `path` - Use the default path of `/` to ping the root, or specify a custom path if preferred. Only valid if the `protocol` is `HTTP` or `HTTPS`.
   EOF
   type        = any
@@ -93,12 +111,15 @@ variable "health_check" {
     condition = alltrue([
       try(var.health_check.port, 80) >= 1,
       try(var.health_check.port, 80) <= 65535,
-      contains(["TCP", "HTTP", "HTTPS"], try(var.health_check.protocol, "TCP")),
-      try(var.health_check.healthy_threshold, 3) <= 10,
-      try(var.health_check.healthy_threshold, 3) >= 2,
-      try(var.health_check.unhealthy_threshold, 3) <= 10,
-      try(var.health_check.unhealthy_threshold, 3) >= 2,
-      contains([10, 30], try(var.health_check.interval, 30)),
+      contains(["HTTP", "HTTPS"], try(var.health_check.protocol, "HTTP")),
+      try(var.health_check.healthy_threshold, 5) <= 10,
+      try(var.health_check.healthy_threshold, 5) >= 2,
+      try(var.health_check.unhealthy_threshold, 2) <= 10,
+      try(var.health_check.unhealthy_threshold, 2) >= 2,
+      try(var.health_check.interval, 30) >= 5,
+      try(var.health_check.interval, 30) <= 300,
+      try(var.health_check.timeout, 5) >= 2,
+      try(var.health_check.timeout, 5) <= 120,
       length(try(var.health_check.path, "/")) <= 1024,
     ])
     error_message = "Not valid parameters for `health_check`."

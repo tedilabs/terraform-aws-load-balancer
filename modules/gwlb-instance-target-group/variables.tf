@@ -62,6 +62,7 @@ variable "health_check" {
       try(var.health_check.interval, 10) <= 300,
       try(var.health_check.timeout, 5) >= 2,
       try(var.health_check.timeout, 5) <= 120,
+      length(try(var.health_check.path, "/")) <= 1024,
     ])
     error_message = "Not valid parameters for `health_check`."
   }
