@@ -36,7 +36,7 @@ variable "targets" {
 
   validation {
     condition     = length(var.targets) <= 1
-    error_message = "The ALB target group is limited to a single Application Load Balancer target. Each value of `targets` block as defined below."
+    error_message = "The ALB target group is limited to a single Application Load Balancer target."
   }
 }
 

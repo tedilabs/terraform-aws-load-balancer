@@ -25,6 +25,7 @@ locals {
 # - `proxy_protocol_v2`
 # - `port`
 # - `slow_start`
+# - `stickiness`
 # - `vpc_id`
 resource "aws_lb_target_group" "this" {
   name = var.name
@@ -33,11 +34,18 @@ resource "aws_lb_target_group" "this" {
 
   ## Attributes
   lambda_multi_value_headers_enabled = var.multi_value_headers_enabled
-  # stickiness {
-  #   enabled = true
-  # }
 
-  # health_check
+  health_check {
+    enabled = try(var.health_check.enabled, false)
+
+    healthy_threshold   = try(var.health_check.healthy_threshold, 5)
+    unhealthy_threshold = try(var.health_check.unhealthy_threshold, 2)
+    interval            = try(var.health_check.interval, 35)
+    timeout             = try(var.health_check.timeout, 30)
+
+    matcher = try(var.health_check.success_codes, "200")
+    path    = try(var.health_check.path, "/")
+  }
 
   tags = merge(
     {
@@ -50,18 +58,21 @@ resource "aws_lb_target_group" "this" {
 
 
 ###################################################
-# Attachment for Lambda Target Group
+# Attachment for ALB Lambda Target Group
 ###################################################
 
 # INFO: Not supported attributes
 # - `port`
 resource "aws_lb_target_group_attachment" "this" {
-  count = var.target_lambda != null ? 1 : 0
+  for_each = {
+    for target in var.targets :
+    target.lambda_function => target
+  }
 
-  # TODO: divide function name and alias
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id         = var.target_lambda
+  # TODO: divide function name and alias
+  target_id         = each.value.lambda_function
   availability_zone = "all"
 
   depends_on = [
@@ -71,13 +82,16 @@ resource "aws_lb_target_group_attachment" "this" {
 
 
 ###################################################
-# Permission for Lambda Target Group
+# Permission for ALB Lambda Target Group
 ###################################################
 
 resource "aws_lambda_permission" "this" {
-  count = var.target_lambda != null ? 1 : 0
+  for_each = {
+    for target in var.targets :
+    target.lambda_function => target
+  }
 
-  function_name = var.target_lambda
+  function_name = each.value.lambda_function
 
   statement_id_prefix = "AllowExecutionFromALB-"
   principal           = "elasticloadbalancing.amazonaws.com"
