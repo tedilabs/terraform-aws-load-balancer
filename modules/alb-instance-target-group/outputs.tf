@@ -38,6 +38,11 @@ output "protocol" {
   value       = aws_lb_target_group.this.protocol
 }
 
+output "protocol_version" {
+  description = "The protocol version to use to send requests to targets."
+  value       = aws_lb_target_group.this.protocol_version
+}
+
 output "targets" {
   description = "A set of targets in the target group."
   value = [
@@ -51,11 +56,10 @@ output "targets" {
 output "attributes" {
   description = "Attributes of the Instance target group of network load balancer."
   value = {
-    terminate_connection_on_deregistration = aws_lb_target_group.this.connection_termination
-    deregistration_delay                   = aws_lb_target_group.this.deregistration_delay
-    preserve_client_ip                     = aws_lb_target_group.this.preserve_client_ip
-    proxy_protocol_v2                      = aws_lb_target_group.this.proxy_protocol_v2
-    stickiness                             = aws_lb_target_group.this.stickiness[0]
+    deregistration_delay     = aws_lb_target_group.this.deregistration_delay
+    load_balancing_algorithm = upper(aws_lb_target_group.this.load_balancing_algorithm_type)
+    slow_start_duration      = aws_lb_target_group.this.slow_start
+    stickiness               = aws_lb_target_group.this.stickiness[0]
   }
 }
 
