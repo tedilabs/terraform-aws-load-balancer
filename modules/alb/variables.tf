@@ -109,7 +109,8 @@ variable "listeners" {
   (Optional) A list of listener configurations of the application load balancer. Listeners listen for connection requests using their `protocol` and `port`. Each value of `listener` block as defined below.
     (Required) `port` - The number of port on which the listener of load balancer is listening.
     (Required) `protocol` - The protocol for connections from clients to the load balancer. Valid values are `HTTP` and `HTTPS`.
-    (Required) `target_group` - The ARN of the target group to which to route traffic.
+    (Required) `default_action_type` - The type of default routing action. Valid values are `FORWARD`, `FIXED_RESPONSE`, `REDIRECT_301` and `REDIRECT_302`.
+    (Optional) `default_action_parameters` - Configuration block for the parameters of the default routing action.
     (Optional) `tls_certificate` - The ARN of the default SSL server certificate. For adding additional SSL certificates, see the `tls_additional_certificates` variable. Required if `protocol` is `HTTPS`.
     (Optional) `tls_additional_certificates` - A set of ARNs of the certificate to attach to the listener. This is for additional certificates and does not replace the default certificate on the listener.
     (Optional) `tls_security_policy` - The name of security policy for a Secure Socket Layer (SSL) negotiation configuration. This is used to negotiate SSL connections with clients. Required if protocol is `HTTPS`. Defaults to `ELBSecurityPolicy-2016-08` security policy. The `ELBSecurityPolicy-2016-08` security policy is always used for backend connections. Application Load Balancers do not support custom security policies.

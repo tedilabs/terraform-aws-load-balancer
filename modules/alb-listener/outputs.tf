@@ -23,18 +23,62 @@ output "protocol" {
   value       = aws_lb_listener.this.protocol
 }
 
-output "type" {
-  description = "The action type for the listener."
-  value       = "forward"
-}
-
-output "target_group" {
-  description = "The target group of the listener to route traffic."
+output "default_action" {
+  description = "The default action for traffic on this listener. Default action apply to traffic that does not meet the conditions of rules on your listener."
   value = {
-    arn      = var.target_group
-    name     = data.aws_lb_target_group.this.name
-    port     = data.aws_lb_target_group.this.port
-    protocol = data.aws_lb_target_group.this.protocol
+    type = var.default_action_type
+    forward = (var.default_action_type == "FORWARD"
+      ? {
+        target_group = [
+          for target in [aws_lb_listener.this.default_action[0].target_group_arn] : {
+            arn      = target
+            name     = data.aws_lb_target_group.this[target].name
+            port     = data.aws_lb_target_group.this[target].port
+            protocol = data.aws_lb_target_group.this[target].protocol
+          }
+
+        ][0]
+      }
+      : null
+    )
+    weighted_forward = try({
+      targets = [
+        for target in aws_lb_listener.this.default_action[0].forward[0].target_group : {
+          target_group = {
+            arn      = target.arn
+            name     = data.aws_lb_target_group.this[target.arn].name
+            port     = data.aws_lb_target_group.this[target.arn].port
+            protocol = data.aws_lb_target_group.this[target.arn].protocol
+          }
+          weight = target.weight
+        }
+      ]
+      stickiness = {
+        enabled  = aws_lb_listener.this.default_action[0].forward[0].stickiness[0].enabled
+        duration = aws_lb_listener.this.default_action[0].forward[0].stickiness[0].duration
+      }
+    }, null)
+    fixed_response = try({
+      status_code  = aws_lb_listener.this.default_action[0].fixed_response[0].status_code
+      content_type = aws_lb_listener.this.default_action[0].fixed_response[0].content_type
+      data         = aws_lb_listener.this.default_action[0].fixed_response[0].message_body
+    }, null)
+    redirect = try({
+      status_code = split("_", aws_lb_listener.this.default_action[0].redirect[0].status_code)[1]
+      protocol    = aws_lb_listener.this.default_action[0].redirect[0].protocol
+      host        = aws_lb_listener.this.default_action[0].redirect[0].host
+      port        = aws_lb_listener.this.default_action[0].redirect[0].port
+      path        = aws_lb_listener.this.default_action[0].redirect[0].path
+      query       = aws_lb_listener.this.default_action[0].redirect[0].query
+      url = format(
+        "%s://%s:%s%s?%s",
+        lower(aws_lb_listener.this.default_action[0].redirect[0].protocol),
+        aws_lb_listener.this.default_action[0].redirect[0].host,
+        aws_lb_listener.this.default_action[0].redirect[0].port,
+        aws_lb_listener.this.default_action[0].redirect[0].path,
+        aws_lb_listener.this.default_action[0].redirect[0].query,
+      )
+    }, null)
   }
 }
 

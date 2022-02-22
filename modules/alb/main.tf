@@ -104,9 +104,11 @@ module "listener" {
 
   load_balancer = aws_lb.this.arn
 
-  port         = each.key
-  protocol     = each.value.protocol
-  target_group = each.value.target_group
+  port     = each.key
+  protocol = each.value.protocol
+
+  default_action_type       = each.value.default_action_type
+  default_action_parameters = try(each.value.default_action_parameters, {})
 
   ## TLS
   tls_certificate             = try(each.value.tls_certificate, null)
