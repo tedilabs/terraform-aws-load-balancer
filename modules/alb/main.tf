@@ -110,6 +110,8 @@ module "listener" {
   default_action_type       = each.value.default_action_type
   default_action_parameters = try(each.value.default_action_parameters, {})
 
+  rules = try(each.value.rules, {})
+
   ## TLS
   tls_certificate             = try(each.value.tls_certificate, null)
   tls_additional_certificates = try(each.value.tls_additional_certificates, [])
