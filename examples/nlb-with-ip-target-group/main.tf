@@ -100,4 +100,8 @@ module "target_group" {
     unhealthy_threshold = 3
     path                = "/health"
   }
+
+  tags = {
+    "project" = "terraform-aws-load-balancer-examples"
+  }
 }

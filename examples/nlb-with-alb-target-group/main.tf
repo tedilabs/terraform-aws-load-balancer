@@ -24,7 +24,7 @@ module "nlb" {
   # source  = "tedilabs/load-balancer/aws//modules/nlb"
   # version = "~> 0.5.0"
 
-  name = "tedilabs-nlb-instance"
+  name = "tedilabs-nlb-alb"
 
   is_public       = false
   ip_address_type = "IPV4"
@@ -47,7 +47,7 @@ module "nlb" {
 
   access_log_enabled       = false
   access_log_s3_bucket     = "my-bucket"
-  access_log_s3_key_prefix = "/tedilabs-nlb-instance/"
+  access_log_s3_key_prefix = "/tedilabs-nlb-alb/"
 
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
@@ -60,42 +60,37 @@ module "nlb" {
 
 
 ###################################################
-# Instance Target Group for Network Load Balancer
+# ALB Target Group for Network Load Balancer
 ###################################################
 
 module "target_group" {
-  source = "../../modules/nlb-instance-target-group"
-  # source  = "tedilabs/load-balancer/aws//modules/nlb-instance-target-group"
+  source = "../../modules/nlb-alb-target-group"
+  # source  = "tedilabs/load-balancer/aws//modules/nlb-alb-target-group"
   # version = "~> 0.5.0"
 
-  name = "tedilabs-nlb-instance-tg"
+  name = "tedilabs-nlb-alb-tg"
 
   vpc_id = data.aws_vpc.default.id
-
-  port     = 80
-  protocol = "TCP"
-
-  ## Attributes
-  terminate_connection_on_deregistration = false
-  deregistration_delay                   = 300
-  preserve_client_ip                     = true
-  proxy_protocol_v2                      = false
+  port   = 80
 
   targets = [
-    # {
-    #   instance = "i-xxxx"
-    # },
+    {
+      alb = module.alb.name
+    }
   ]
 
   health_check = {
     port                = 80
     protocol            = "HTTP"
     interval            = 10
-    timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3
-    path                = "/health"
+    path                = "/ping"
   }
+
+  depends_on = [
+    module.alb,
+  ]
 
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
