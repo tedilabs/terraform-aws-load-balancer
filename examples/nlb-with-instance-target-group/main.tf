@@ -20,8 +20,9 @@ data "aws_subnet" "default" {
 ###################################################
 
 module "nlb" {
-  source  = "tedilabs/load-balancer/aws//modules/nlb"
-  version = "~> 0.2.0"
+  source = "../../modules/nlb"
+  # source  = "tedilabs/load-balancer/aws//modules/nlb"
+  # version = "~> 0.5.0"
 
   name = "tedilabs-nlb-instance"
 
@@ -41,7 +42,7 @@ module "nlb" {
   listeners = [{
     port         = 80
     protocol     = "TCP"
-    target_group = module.target_group.arn
+    target_group = module.target_group.name
   }]
 
   access_log_enabled       = false
@@ -51,6 +52,10 @@ module "nlb" {
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
   }
+
+  depends_on = [
+    module.target_group,
+  ]
 }
 
 
@@ -59,8 +64,9 @@ module "nlb" {
 ###################################################
 
 module "target_group" {
-  source  = "tedilabs/load-balancer/aws//modules/nlb-instance-target-group"
-  version = "~> 0.2.0"
+  source = "../../modules/nlb-instance-target-group"
+  # source  = "tedilabs/load-balancer/aws//modules/nlb-instance-target-group"
+  # version = "~> 0.5.0"
 
   name = "tedilabs-nlb-instance-tg"
 
