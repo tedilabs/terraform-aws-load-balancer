@@ -20,8 +20,9 @@ data "aws_subnet" "default" {
 ###################################################
 
 module "gwlb" {
-  source  = "tedilabs/load-balancer/aws//modules/gwlb"
-  version = "~> 0.2.0"
+  source = "../../modules/gwlb"
+  # source  = "tedilabs/load-balancer/aws//modules/gwlb"
+  # version = "~> 0.5.0"
 
   name = "tedilabs-gwlb-instance"
   network_mapping = {
@@ -37,12 +38,16 @@ module "gwlb" {
 
   listeners = [{
     port         = 6081
-    target_group = module.target_group.arn
+    target_group = module.target_group.name
   }]
 
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
   }
+
+  depends_on = [
+    module.target_group,
+  ]
 }
 
 
@@ -51,8 +56,9 @@ module "gwlb" {
 ###################################################
 
 module "target_group" {
-  source  = "tedilabs/load-balancer/aws//modules/gwlb-instance-target-group"
-  version = "~> 0.2.0"
+  source = "../../modules/gwlb-instance-target-group"
+  # source  = "tedilabs/load-balancer/aws//modules/gwlb-instance-target-group"
+  # version = "~> 0.5.0"
 
   name = "tedilabs-gwlb-instance-tg"
 

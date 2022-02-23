@@ -33,13 +33,20 @@ variable "listeners" {
   description = <<EOF
   (Optional) A list of listener configurations of the gateway load balancer. Listeners listen for connection requests using their `protocol` and `port`. Each value of `listener` block as defined below.
     (Required) `port` - The number of port on which the listener of load balancer is listening. Must be `6081`.
-    (Required) `target_group` - The ARN of the target group to which to route traffic.
+    (Required) `target_group` - The name of the target group to which to route traffic.
   EOF
   type = set(object({
     port         = number
     target_group = string
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      length(var.listeners) <= 1,
+    ])
+    error_message = "Not valid parameters for `listeners`."
+  }
 }
 
 variable "tags" {

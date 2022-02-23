@@ -20,7 +20,7 @@ data "aws_lb" "this" {
 }
 
 data "aws_lb_target_group" "this" {
-  arn = var.target_group
+  name = var.target_group
 }
 
 locals {
@@ -41,7 +41,7 @@ resource "aws_lb_listener" "this" {
 
   default_action {
     type             = "forward"
-    target_group_arn = var.target_group
+    target_group_arn = data.aws_lb_target_group.this.arn
   }
 
   tags = merge(

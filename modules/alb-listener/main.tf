@@ -35,7 +35,7 @@ data "aws_lb_target_group" "this" {
     ]...
   )
 
-  arn = each.value
+  name = each.value
 }
 
 locals {
@@ -62,7 +62,7 @@ resource "aws_lb_listener" "this" {
     content {
       type = "forward"
 
-      target_group_arn = default_action.value.target_group
+      target_group_arn = data.aws_lb_target_group.this[default_action.value.target_group].arn
     }
   }
 
@@ -80,7 +80,7 @@ resource "aws_lb_listener" "this" {
           for_each = default_action.value.targets
 
           content {
-            arn    = target_group.value.target_group
+            arn    = data.aws_lb_target_group.this[target_group.value.target_group].arn
             weight = try(target_group.value.weight, 1)
           }
         }
@@ -239,7 +239,7 @@ resource "aws_lb_listener_rule" "this" {
     content {
       type = "forward"
 
-      target_group_arn = action.value.target_group
+      target_group_arn = data.aws_lb_target_group.this[action.value.target_group].arn
     }
   }
 
@@ -257,7 +257,7 @@ resource "aws_lb_listener_rule" "this" {
           for_each = action.value.targets
 
           content {
-            arn    = target_group.value.target_group
+            arn    = data.aws_lb_target_group.this[target_group.value.target_group].arn
             weight = try(target_group.value.weight, 1)
           }
         }

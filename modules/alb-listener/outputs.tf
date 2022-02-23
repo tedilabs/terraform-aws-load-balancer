@@ -30,8 +30,8 @@ output "default_action" {
     forward = (var.default_action_type == "FORWARD"
       ? {
         target_group = [
-          for target in [aws_lb_listener.this.default_action[0].target_group_arn] : {
-            arn      = target
+          for target in [var.default_action_parameters.target_group] : {
+            arn      = data.aws_lb_target_group.this[target].arn
             name     = data.aws_lb_target_group.this[target].name
             port     = data.aws_lb_target_group.this[target].port
             protocol = data.aws_lb_target_group.this[target].protocol
@@ -42,14 +42,14 @@ output "default_action" {
     )
     weighted_forward = try({
       targets = [
-        for target in aws_lb_listener.this.default_action[0].forward[0].target_group : {
+        for target in var.default_action_parameters.targets : {
           target_group = {
-            arn      = target.arn
-            name     = data.aws_lb_target_group.this[target.arn].name
-            port     = data.aws_lb_target_group.this[target.arn].port
-            protocol = data.aws_lb_target_group.this[target.arn].protocol
+            arn      = data.aws_lb_target_group.this[target.target_group].arn
+            name     = data.aws_lb_target_group.this[target.target_group].name
+            port     = data.aws_lb_target_group.this[target.target_group].port
+            protocol = data.aws_lb_target_group.this[target.target_group].protocol
           }
-          weight = target.weight
+          weight = try(target.weight, 1)
         }
       ]
       stickiness = {
@@ -106,8 +106,8 @@ output "rules" {
         forward = (var.rules[rule.priority].action_type == "FORWARD"
           ? {
             target_group = [
-              for target in [rule.action[0].target_group_arn] : {
-                arn      = target
+              for target in [var.rules[rule.priority].action_parameters.target_group] : {
+                arn      = data.aws_lb_target_group.this[target].arn
                 name     = data.aws_lb_target_group.this[target].name
                 port     = data.aws_lb_target_group.this[target].port
                 protocol = data.aws_lb_target_group.this[target].protocol
@@ -118,14 +118,14 @@ output "rules" {
         )
         weighted_forward = try({
           targets = [
-            for target in rule.action[0].forward[0].target_group : {
+            for target in var.rules[rule.priority].action_parameters.targets : {
               target_group = {
-                arn      = target.arn
-                name     = data.aws_lb_target_group.this[target.arn].name
-                port     = data.aws_lb_target_group.this[target.arn].port
-                protocol = data.aws_lb_target_group.this[target.arn].protocol
+                arn      = data.aws_lb_target_group.this[target.target_group].arn
+                name     = data.aws_lb_target_group.this[target.target_group].name
+                port     = data.aws_lb_target_group.this[target.target_group].port
+                protocol = data.aws_lb_target_group.this[target.target_group].protocol
               }
-              weight = target.weight
+              weight = try(target.weight, 1)
             }
           ]
           stickiness = {
