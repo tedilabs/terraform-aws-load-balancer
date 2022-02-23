@@ -22,7 +22,7 @@ data "aws_subnet" "default" {
 module "gwlb" {
   source = "../../modules/gwlb"
   # source  = "tedilabs/load-balancer/aws//modules/gwlb"
-  # version = "~> 0.5.0"
+  # version = "~> 1.0.0"
 
   name = "tedilabs-gwlb-ip"
   network_mapping = {
@@ -58,7 +58,7 @@ module "gwlb" {
 module "target_group" {
   source = "../../modules/gwlb-ip-target-group"
   # source  = "tedilabs/load-balancer/aws//modules/gwlb-ip-target-group"
-  # version = "~> 0.5.0"
+  # version = "~> 1.0.0"
 
   name = "tedilabs-gwlb-ip-tg"
 
