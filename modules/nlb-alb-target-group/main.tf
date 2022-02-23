@@ -15,6 +15,12 @@ locals {
 }
 
 
+data "aws_lb" "this" {
+  for_each = toset(try(var.targets.*.alb, []))
+
+  name = each.value
+}
+
 # INFO: Not supported attributes
 # - `connection_termination`
 # - `lambda_multi_value_headers_enabled`
@@ -78,6 +84,6 @@ resource "aws_lb_target_group_attachment" "this" {
 
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id = each.value.alb
+  target_id = data.aws_lb.this[each.value.alb].arn
   port      = var.port
 }

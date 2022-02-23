@@ -30,6 +30,7 @@ No modules.
 | [aws_lb_target_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_lb_target_group_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group_attachment) | resource |
 | [aws_resourcegroups_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/resourcegroups_group) | resource |
+| [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/lb) | data source |
 
 ## Inputs
 
@@ -44,7 +45,7 @@ No modules.
 | <a name="input_resource_group_enabled"></a> [resource\_group\_enabled](#input\_resource\_group\_enabled) | (Optional) Whether to create Resource Group to find and group AWS resources which are created by this module. | `bool` | `true` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources. | `map(string)` | `{}` | no |
-| <a name="input_targets"></a> [targets](#input\_targets) | (Optional) A set of targets to add to the target group. The ALB target group is limited to a single Application Load Balancer target. Each value of `targets` block as defined below.<br>    (Required) `alb` - The Amazon Resource Name (ARN) of the target ALB (Application Load Balancer). | `set(map(string))` | `[]` | no |
+| <a name="input_targets"></a> [targets](#input\_targets) | (Optional) A set of targets to add to the target group. The ALB target group is limited to a single Application Load Balancer target. Each value of `targets` block as defined below.<br>    (Required) `alb` - The name of the target ALB (Application Load Balancer). | `set(map(string))` | `[]` | no |
 
 ## Outputs
 

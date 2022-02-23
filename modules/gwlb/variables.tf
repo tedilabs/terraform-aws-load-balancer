@@ -42,10 +42,8 @@ variable "listeners" {
   default = []
 
   validation {
-    condition = alltrue([
-      length(var.listeners) <= 1,
-    ])
-    error_message = "Not valid parameters for `listeners`."
+    condition     = length(var.listeners) <= 1
+    error_message = "The Gateway Load Balancer is limited to a single listener."
   }
 }
 

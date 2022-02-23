@@ -29,7 +29,7 @@ variable "port" {
 variable "targets" {
   description = <<EOF
   (Optional) A set of targets to add to the target group. The ALB target group is limited to a single Application Load Balancer target. Each value of `targets` block as defined below.
-    (Required) `alb` - The Amazon Resource Name (ARN) of the target ALB (Application Load Balancer).
+    (Required) `alb` - The name of the target ALB (Application Load Balancer).
   EOF
   type        = set(map(string))
   default     = []

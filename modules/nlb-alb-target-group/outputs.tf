@@ -41,8 +41,11 @@ output "protocol" {
 output "targets" {
   description = "A set of targets in the target group. The ALB target group is limited to a single Application Load Balancer target."
   value = [
-    for target in aws_lb_target_group_attachment.this : {
-      alb  = target.target_id
+    for name, target in aws_lb_target_group_attachment.this : {
+      alb = {
+        arn  = target.target_id
+        name = name
+      }
       port = target.port
     }
   ]
