@@ -52,7 +52,10 @@ resource "aws_lb" "this" {
   load_balancer_type = lower(local.load_balancer_type)
   internal           = !var.is_public
   ip_address_type    = lower(var.ip_address_type)
-  security_groups    = var.security_groups
+  security_groups = setunion(
+    [module.security_group.id],
+    var.security_groups,
+  )
 
   dynamic "subnet_mapping" {
     for_each = local.enabled_network_mapping
