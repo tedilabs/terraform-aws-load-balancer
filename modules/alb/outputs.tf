@@ -43,9 +43,22 @@ output "ip_address_type" {
   value       = upper(aws_lb.this.ip_address_type)
 }
 
+output "default_security_group" {
+  description = "The default security group of the load balancer."
+  value = {
+    id   = module.security_group.id
+    name = module.security_group.name
+
+    ingress_cidrs           = try(var.default_security_group.ingress_cidrs, [])
+    ingress_ipv6_cidrs      = try(var.default_security_group.ingress_ipv6_cidrs, [])
+    ingress_prefix_lists    = try(var.default_security_group.ingress_prefix_lists, [])
+    ingress_security_groups = try(var.default_security_group.ingress_security_groups, [])
+  }
+}
+
 output "security_groups" {
   description = "A set of security group IDs which is assigned to the load balancer."
-  value       = var.security_groups
+  value       = aws_lb.this.security_groups
 }
 
 output "availability_zone_ids" {

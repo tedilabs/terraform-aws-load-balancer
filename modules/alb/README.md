@@ -19,13 +19,14 @@ This module creates following resources.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.0.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.2.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_listener"></a> [listener](#module\_listener) | ../alb-listener | n/a |
+| <a name="module_security_group"></a> [security\_group](#module\_security\_group) | tedilabs/network/aws//modules/security-group | ~> 0.25.0 |
 
 ## Resources
 
@@ -44,6 +45,7 @@ This module creates following resources.
 | <a name="input_access_log_enabled"></a> [access\_log\_enabled](#input\_access\_log\_enabled) | (Optional) Indicates whether to enable access logs. Defaults to `false`, even when bucket is specified. | `bool` | `false` | no |
 | <a name="input_access_log_s3_bucket"></a> [access\_log\_s3\_bucket](#input\_access\_log\_s3\_bucket) | (Optional) The name of the S3 bucket used to store the access logs. | `string` | `null` | no |
 | <a name="input_access_log_s3_key_prefix"></a> [access\_log\_s3\_key\_prefix](#input\_access\_log\_s3\_key\_prefix) | (Optional) The key prefix for the specified S3 bucket. | `string` | `null` | no |
+| <a name="input_default_security_group"></a> [default\_security\_group](#input\_default\_security\_group) | (Optional) The configuration of the default security group for your load balancer. `default_security_group` block as defined below.<br>    (Optional) `name` - The name of the default security group.<br>    (Optional) `description` - The description of the default security group.<br>    (Optional) `ingress_cidrs` - A list of IPv4 CIDR blocks to allow inbound traffic from.<br>    (Optional) `ingress_ipv6_cidrs` - A list of IPv6 CIDR blocks to allow inbound traffic from.<br>    (Optional) `ingress_prefix_lists` - A list of Prefix List IDs to allow inbound traffic from.<br>    (Optional) `ingress_security_groups` - A list of source Security Group IDs to allow inbound traffic from. | `any` | `{}` | no |
 | <a name="input_deletion_protection_enabled"></a> [deletion\_protection\_enabled](#input\_deletion\_protection\_enabled) | (Optional) Indicates whether deletion of the load balancer via the AWS API will be protected. Defaults to `false`. | `bool` | `false` | no |
 | <a name="input_desync_mitigation_mode"></a> [desync\_mitigation\_mode](#input\_desync\_mitigation\_mode) | (Optional) Determines how the load balancer handles requests that might pose a security risk to your application. Valid values are `DEFENSIVE`, `STRICTEST` and `MONITOR`. Defaults to `DEFENSIVE`. | `string` | `"DEFENSIVE"` | no |
 | <a name="input_drop_invalid_header_fields"></a> [drop\_invalid\_header\_fields](#input\_drop\_invalid\_header\_fields) | (Optional) Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). Elastic Load Balancing requires that message header names contain only alphanumeric characters and hyphens. Defaults to `false`. | `bool` | `false` | no |
@@ -71,6 +73,7 @@ This module creates following resources.
 | <a name="output_attributes"></a> [attributes](#output\_attributes) | Load Balancer Attributes that applied to the application load balancer. |
 | <a name="output_availability_zone_ids"></a> [availability\_zone\_ids](#output\_availability\_zone\_ids) | A list of the Availability Zone IDs which are used by the load balancer. |
 | <a name="output_available_availability_zone_ids"></a> [available\_availability\_zone\_ids](#output\_available\_availability\_zone\_ids) | A list of the Availability Zone IDs available to the current account and region. |
+| <a name="output_default_security_group"></a> [default\_security\_group](#output\_default\_security\_group) | The default security group of the load balancer. |
 | <a name="output_domain"></a> [domain](#output\_domain) | The DNS name of the load balancer. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the load balancer. |
 | <a name="output_ip_address_type"></a> [ip\_address\_type](#output\_ip\_address\_type) | The type of IP addresses used by the subnets for your load balancer. |

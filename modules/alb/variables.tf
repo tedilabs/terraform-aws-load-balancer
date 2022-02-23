@@ -25,15 +25,24 @@ variable "ip_address_type" {
   }
 }
 
+variable "default_security_group" {
+  description = <<EOF
+  (Optional) The configuration of the default security group for your load balancer. `default_security_group` block as defined below.
+    (Optional) `name` - The name of the default security group.
+    (Optional) `description` - The description of the default security group.
+    (Optional) `ingress_cidrs` - A list of IPv4 CIDR blocks to allow inbound traffic from.
+    (Optional) `ingress_ipv6_cidrs` - A list of IPv6 CIDR blocks to allow inbound traffic from.
+    (Optional) `ingress_prefix_lists` - A list of Prefix List IDs to allow inbound traffic from.
+    (Optional) `ingress_security_groups` - A list of source Security Group IDs to allow inbound traffic from.
+  EOF
+  type        = any
+  default     = {}
+}
+
 variable "security_groups" {
   description = "(Optional) A set of security group IDs to assign to the load balancer."
   type        = set(string)
   default     = []
-
-  validation {
-    condition     = length(var.security_groups) > 0
-    error_message = "A security group must be specified."
-  }
 }
 
 variable "network_mapping" {
