@@ -23,18 +23,16 @@ output "protocol" {
   value       = aws_lb_listener.this.protocol
 }
 
-output "type" {
-  description = "The action type for the listener."
-  value       = "forward"
-}
-
-output "target_group" {
-  description = "The target group of the listener to route traffic."
+output "default_action" {
+  description = "The default action for traffic on this listener."
   value = {
-    arn      = var.target_group
-    name     = data.aws_lb_target_group.this.name
-    port     = data.aws_lb_target_group.this.port
-    protocol = data.aws_lb_target_group.this.protocol
+    type = "FORWARD"
+    forward = {
+      arn      = data.aws_lb_target_group.this.arn
+      name     = data.aws_lb_target_group.this.name
+      port     = data.aws_lb_target_group.this.port
+      protocol = data.aws_lb_target_group.this.protocol
+    }
   }
 }
 

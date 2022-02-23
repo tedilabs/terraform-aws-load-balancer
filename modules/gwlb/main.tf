@@ -25,6 +25,15 @@ data "aws_subnet" "this" {
   id = each.value.subnet_id
 }
 
+data "aws_lb_target_group" "this" {
+  for_each = {
+    for listener in var.listeners :
+    listener.port => listener
+  }
+
+  name = each.value.target_group
+}
+
 locals {
   load_balancer_type = "GATEWAY"
 
@@ -102,15 +111,6 @@ resource "aws_lb_listener" "this" {
 
   default_action {
     type             = "forward"
-    target_group_arn = each.value.target_group
+    target_group_arn = data.aws_lb_target_group.this[each.key].arn
   }
-}
-
-data "aws_lb_target_group" "this" {
-  for_each = {
-    for listener in var.listeners :
-    listener.port => listener
-  }
-
-  arn = each.value.target_group
 }

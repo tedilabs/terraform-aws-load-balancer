@@ -68,12 +68,16 @@ output "listeners" {
       port     = port
       protocol = "GENEVE"
 
-      type = "forward"
-      target_group = {
-        arn      = listener.default_action[0].target_group_arn
-        name     = data.aws_lb_target_group.this[port].name
-        port     = data.aws_lb_target_group.this[port].port
-        protocol = data.aws_lb_target_group.this[port].protocol
+      default_action = {
+        type = "FORWARD"
+        forward = {
+          target_group = {
+            arn      = data.aws_lb_target_group.this[port].arn
+            name     = data.aws_lb_target_group.this[port].name
+            port     = data.aws_lb_target_group.this[port].port
+            protocol = data.aws_lb_target_group.this[port].protocol
+          }
+        }
       }
     }
   }
