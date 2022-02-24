@@ -28,10 +28,8 @@ output "default_action" {
   value = {
     type = "FORWARD"
     forward = {
-      arn      = data.aws_lb_target_group.this.arn
-      name     = data.aws_lb_target_group.this.name
-      port     = data.aws_lb_target_group.this.port
-      protocol = data.aws_lb_target_group.this.protocol
+      arn  = var.target_group
+      name = split("/", var.target_group)[1]
     }
   }
 }
