@@ -1,8 +1,3 @@
-locals {
-  vpc_id = values(data.aws_subnet.this)[0].vpc_id
-}
-
-
 ###################################################
 # Security Group for Application Load Balancer
 ###################################################
@@ -11,7 +6,7 @@ module "security_group" {
   source  = "tedilabs/network/aws//modules/security-group"
   version = "~> 0.25.0"
 
-  vpc_id = local.vpc_id
+  vpc_id = var.vpc_id
 
   name        = try(var.default_security_group.name, local.metadata.name)
   description = try(var.default_security_group.description, "Managed by Terraform.")
