@@ -45,6 +45,11 @@ variable "security_groups" {
   default     = []
 }
 
+variable "vpc_id" {
+  description = "(Required) The ID of the VPC which the load balancer belongs to."
+  type        = string
+}
+
 variable "network_mapping" {
   description = <<EOF
   (Optional) The configuration for the load balancer how routes traffic to targets in which subnets, and in accordance with IP address settings. Select at least two Availability Zone and one subnet for each zone. The load balancer will route traffic only to targets in the selected Availability Zones. Zones that are not supported by the load balancer or VPC cannot be selected. Subnets can be added, but not removed, once a load balancer is created. Each key of `network_mapping` is the availability zone id like `apne2-az1`, `use1-az1`. Each value of `network_mapping` block as defined below.

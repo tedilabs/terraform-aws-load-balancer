@@ -28,6 +28,7 @@ module "alb" {
 
   is_public       = false
   ip_address_type = "IPV4"
+  vpc_id          = data.aws_vpc.default.id
   network_mapping = {
     for az, subnet in data.aws_subnet.default :
     az => {
