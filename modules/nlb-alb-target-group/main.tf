@@ -16,9 +16,9 @@ locals {
 
 
 data "aws_lb" "this" {
-  for_each = toset(try(var.targets.*.alb, []))
+  count = length(var.targets) > 0 ? 1 : 0
 
-  name = each.value
+  arn = var.targets[0].alb
 }
 
 # INFO: Not supported attributes
@@ -77,13 +77,10 @@ resource "aws_lb_target_group" "this" {
 # INFO: Not supported attributes
 # - `availability_zone`
 resource "aws_lb_target_group_attachment" "this" {
-  for_each = {
-    for target in var.targets :
-    target.alb => target
-  }
+  count = length(var.targets) > 0 ? 1 : 0
 
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id = data.aws_lb.this[each.value.alb].arn
+  target_id = var.targets[0].alb
   port      = var.port
 }

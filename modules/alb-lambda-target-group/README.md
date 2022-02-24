@@ -45,7 +45,7 @@ No modules.
 | <a name="input_resource_group_enabled"></a> [resource\_group\_enabled](#input\_resource\_group\_enabled) | (Optional) Whether to create Resource Group to find and group AWS resources which are created by this module. | `bool` | `true` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources. | `map(string)` | `{}` | no |
-| <a name="input_targets"></a> [targets](#input\_targets) | (Optional) A set of targets to add to the target group. The Lambda target group is limited to a single Lambda function target. The load balancer starts routing requests to a newly registered target as soon as the registration process completes and the target passes the initial health checks (if enabled). Each value of `targets` block as defined below.<br>    (Required) `lambda_function` - The Amazon Resource Name (ARN) of the target Lambda. If your ARN does not specify a version or alias, the latest version ($LATEST) will be used by default. ARNs that specify a version / alias do so after the function name, and are separated by a colon. | `set(map(string))` | `[]` | no |
+| <a name="input_targets"></a> [targets](#input\_targets) | (Optional) A list of targets to add to the target group. The Lambda target group is limited to a single Lambda function target. The load balancer starts routing requests to a newly registered target as soon as the registration process completes and the target passes the initial health checks (if enabled). Each value of `targets` block as defined below.<br>    (Required) `lambda_function` - The Amazon Resource Name (ARN) of the target Lambda. If your ARN does not specify a version or alias, the latest version ($LATEST) will be used by default. ARNs that specify a version / alias do so after the function name, and are separated by a colon. | `list(map(string))` | `[]` | no |
 
 ## Outputs
 
@@ -57,6 +57,6 @@ No modules.
 | <a name="output_health_check"></a> [health\_check](#output\_health\_check) | Health Check configuration of the target group. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the target group. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |
-| <a name="output_targets"></a> [targets](#output\_targets) | A set of targets in the target group. The Lambda target group is limited to a single Lambda function target. |
+| <a name="output_targets"></a> [targets](#output\_targets) | A list of targets in the target group. The Lambda target group is limited to a single Lambda function target. |
 | <a name="output_type"></a> [type](#output\_type) | The target type of the target group. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

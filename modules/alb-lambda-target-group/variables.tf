@@ -10,10 +10,10 @@ variable "name" {
 
 variable "targets" {
   description = <<EOF
-  (Optional) A set of targets to add to the target group. The Lambda target group is limited to a single Lambda function target. The load balancer starts routing requests to a newly registered target as soon as the registration process completes and the target passes the initial health checks (if enabled). Each value of `targets` block as defined below.
+  (Optional) A list of targets to add to the target group. The Lambda target group is limited to a single Lambda function target. The load balancer starts routing requests to a newly registered target as soon as the registration process completes and the target passes the initial health checks (if enabled). Each value of `targets` block as defined below.
     (Required) `lambda_function` - The Amazon Resource Name (ARN) of the target Lambda. If your ARN does not specify a version or alias, the latest version ($LATEST) will be used by default. ARNs that specify a version / alias do so after the function name, and are separated by a colon.
   EOF
-  type        = set(map(string))
+  type        = list(map(string))
   default     = []
 
   validation {
