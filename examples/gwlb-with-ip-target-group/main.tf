@@ -38,16 +38,12 @@ module "gwlb" {
 
   listeners = [{
     port         = 6081
-    target_group = module.target_group.name
+    target_group = module.target_group.arn
   }]
 
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
   }
-
-  depends_on = [
-    module.target_group,
-  ]
 }
 
 
