@@ -19,7 +19,7 @@ variable "protocol" {
 }
 
 variable "target_group" {
-  description = "(Required) The name of the target group to which to route traffic."
+  description = "(Required) The ARN of the target group to which to route traffic."
   type        = string
 }
 

@@ -44,7 +44,7 @@ output "targets" {
     for idx, target in aws_lb_target_group_attachment.this : {
       alb = {
         arn  = target.target_id
-        name = data.aws_lb.this[idx].name
+        name = split("/", target.target_id)[2]
       }
       port = target.port
     }

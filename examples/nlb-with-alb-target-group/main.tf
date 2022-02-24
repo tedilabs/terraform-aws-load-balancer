@@ -42,7 +42,7 @@ module "nlb" {
   listeners = [{
     port         = 80
     protocol     = "TCP"
-    target_group = module.target_group.name
+    target_group = module.target_group.arn
   }]
 
   access_log_enabled       = false
@@ -52,10 +52,6 @@ module "nlb" {
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
   }
-
-  depends_on = [
-    module.target_group,
-  ]
 }
 
 

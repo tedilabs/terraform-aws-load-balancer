@@ -15,16 +15,8 @@ locals {
 }
 
 
-data "aws_lb" "this" {
-  arn = var.load_balancer
-}
-
-data "aws_lb_target_group" "this" {
-  name = var.target_group
-}
-
 locals {
-  load_balancer_name = data.aws_lb.this.name
+  load_balancer_name = split("/", var.load_balancer)[2]
   tls_enabled        = var.protocol == "TLS"
 }
 
@@ -41,7 +33,7 @@ resource "aws_lb_listener" "this" {
 
   default_action {
     type             = "forward"
-    target_group_arn = data.aws_lb_target_group.this.arn
+    target_group_arn = var.target_group
   }
 
   tags = merge(

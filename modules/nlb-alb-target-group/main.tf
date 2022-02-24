@@ -15,12 +15,6 @@ locals {
 }
 
 
-data "aws_lb" "this" {
-  count = length(var.targets) > 0 ? 1 : 0
-
-  arn = var.targets[0].alb
-}
-
 # INFO: Not supported attributes
 # - `connection_termination`
 # - `lambda_multi_value_headers_enabled`
