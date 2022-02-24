@@ -75,7 +75,7 @@ module "target_group" {
 
   targets = [
     {
-      alb = module.alb.name
+      alb = module.alb.arn
     }
   ]
 
@@ -88,11 +88,11 @@ module "target_group" {
     path                = "/ping"
   }
 
-  depends_on = [
-    module.alb,
-  ]
-
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
   }
+
+  depends_on = [
+    module.alb,
+  ]
 }

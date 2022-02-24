@@ -24,10 +24,12 @@ output "type" {
 }
 
 output "targets" {
-  description = "A set of targets in the target group. The Lambda target group is limited to a single Lambda function target."
+  description = "A list of targets in the target group. The Lambda target group is limited to a single Lambda function target."
   value = [
     for target in aws_lb_target_group_attachment.this : {
-      lambda_function = target.target_id
+      lambda_function = {
+        arn = target.target_id
+      }
     }
   ]
 }

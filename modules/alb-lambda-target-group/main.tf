@@ -64,15 +64,12 @@ resource "aws_lb_target_group" "this" {
 # INFO: Not supported attributes
 # - `port`
 resource "aws_lb_target_group_attachment" "this" {
-  for_each = {
-    for target in var.targets :
-    target.lambda_function => target
-  }
+  count = length(var.targets) > 0 ? 1 : 0
 
   target_group_arn = aws_lb_target_group.this.arn
 
   # TODO: divide function name and alias
-  target_id         = each.value.lambda_function
+  target_id         = var.targets[0].lambda_function
   availability_zone = "all"
 
   depends_on = [
@@ -86,12 +83,9 @@ resource "aws_lb_target_group_attachment" "this" {
 ###################################################
 
 resource "aws_lambda_permission" "this" {
-  for_each = {
-    for target in var.targets :
-    target.lambda_function => target
-  }
+  count = length(var.targets) > 0 ? 1 : 0
 
-  function_name = each.value.lambda_function
+  function_name = var.targets[0].lambda_function
 
   statement_id_prefix = "AllowExecutionFromALB-"
   principal           = "elasticloadbalancing.amazonaws.com"

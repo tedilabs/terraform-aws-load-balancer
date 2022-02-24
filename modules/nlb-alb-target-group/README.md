@@ -45,7 +45,7 @@ No modules.
 | <a name="input_resource_group_enabled"></a> [resource\_group\_enabled](#input\_resource\_group\_enabled) | (Optional) Whether to create Resource Group to find and group AWS resources which are created by this module. | `bool` | `true` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources. | `map(string)` | `{}` | no |
-| <a name="input_targets"></a> [targets](#input\_targets) | (Optional) A set of targets to add to the target group. The ALB target group is limited to a single Application Load Balancer target. Each value of `targets` block as defined below.<br>    (Required) `alb` - The name of the target ALB (Application Load Balancer). | `set(map(string))` | `[]` | no |
+| <a name="input_targets"></a> [targets](#input\_targets) | (Optional) A list of targets to add to the target group. The ALB target group is limited to a single Application Load Balancer target. Each value of `targets` block as defined below.<br>    (Required) `alb` - The Amazon Resource Name (ARN) of the target ALB (Application Load Balancer). | `list(map(string))` | `[]` | no |
 
 ## Outputs
 
@@ -59,7 +59,7 @@ No modules.
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |
 | <a name="output_port"></a> [port](#output\_port) | The port number on which the target receive trrafic. |
 | <a name="output_protocol"></a> [protocol](#output\_protocol) | The protocol to use to connect with the target. |
-| <a name="output_targets"></a> [targets](#output\_targets) | A set of targets in the target group. The ALB target group is limited to a single Application Load Balancer target. |
+| <a name="output_targets"></a> [targets](#output\_targets) | A list of targets in the target group. The ALB target group is limited to a single Application Load Balancer target. |
 | <a name="output_type"></a> [type](#output\_type) | The target type of the target group. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC which the target group belongs to. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
