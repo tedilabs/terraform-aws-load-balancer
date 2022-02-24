@@ -58,27 +58,24 @@ output "attributes" {
 
 output "listeners" {
   description = "Listeners of the load balancer."
-  value = {
-    for port, listener in aws_lb_listener.this :
-    port => {
-      id   = listener.id
-      arn  = listener.arn
-      name = "${var.name}/GENEVE:${port}"
+  value = length(var.listeners) > 0 ? {
+    (var.listeners[0].port) = {
+      id   = aws_lb_listener.this[0].id
+      arn  = aws_lb_listener.this[0].arn
+      name = "${var.name}/GENEVE:${var.listeners[0].port}"
 
-      port     = port
+      port     = var.listeners[0].port
       protocol = "GENEVE"
 
       default_action = {
         type = "FORWARD"
         forward = {
           target_group = {
-            arn      = data.aws_lb_target_group.this[port].arn
-            name     = data.aws_lb_target_group.this[port].name
-            port     = data.aws_lb_target_group.this[port].port
-            protocol = data.aws_lb_target_group.this[port].protocol
+            arn  = var.listeners[0].target_group
+            name = split("/", var.listeners[0].target_group)[1]
           }
         }
       }
     }
-  }
+  } : {}
 }
