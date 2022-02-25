@@ -15,31 +15,8 @@ locals {
 }
 
 
-data "aws_lb" "this" {
-  arn = var.load_balancer
-}
-
-data "aws_lb_target_group" "this" {
-  for_each = setunion(
-    try([var.default_action_parameters.target_group], []),
-    try(var.default_action_parameters.targets.*.target_group, []),
-    [
-      for rule in values(var.rules) :
-      rule.action_parameters.target_group
-      if rule.action_type == "FORWARD"
-    ],
-    [
-      for rule in values(var.rules) :
-      rule.action_parameters.targets.*.target_group
-      if rule.action_type == "WEIGHTED_FORWARD"
-    ]...
-  )
-
-  name = each.value
-}
-
 locals {
-  load_balancer_name = data.aws_lb.this.name
+  load_balancer_name = split("/", var.load_balancer)[2]
   tls_enabled        = var.protocol == "HTTPS"
 }
 
@@ -62,7 +39,7 @@ resource "aws_lb_listener" "this" {
     content {
       type = "forward"
 
-      target_group_arn = data.aws_lb_target_group.this[default_action.value.target_group].arn
+      target_group_arn = default_action.value.target_group
     }
   }
 
@@ -80,7 +57,7 @@ resource "aws_lb_listener" "this" {
           for_each = default_action.value.targets
 
           content {
-            arn    = data.aws_lb_target_group.this[target_group.value.target_group].arn
+            arn    = target_group.value.target_group
             weight = try(target_group.value.weight, 1)
           }
         }
@@ -168,7 +145,10 @@ resource "aws_lb_listener" "this" {
 ###################################################
 
 resource "aws_lb_listener_rule" "this" {
-  for_each = var.rules
+  for_each = {
+    for rule in var.rules :
+    rule.priority => rule
+  }
 
   listener_arn = aws_lb_listener.this.arn
 
@@ -239,7 +219,7 @@ resource "aws_lb_listener_rule" "this" {
     content {
       type = "forward"
 
-      target_group_arn = data.aws_lb_target_group.this[action.value.target_group].arn
+      target_group_arn = action.value.target_group
     }
   }
 
@@ -257,7 +237,7 @@ resource "aws_lb_listener_rule" "this" {
           for_each = action.value.targets
 
           content {
-            arn    = data.aws_lb_target_group.this[target_group.value.target_group].arn
+            arn    = target_group.value.target_group
             weight = try(target_group.value.weight, 1)
           }
         }
