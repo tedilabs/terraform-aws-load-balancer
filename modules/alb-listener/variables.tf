@@ -39,9 +39,9 @@ variable "default_action_parameters" {
     (Optional) `port` - The port of the redirect url. Valid values are from `1` to `65535` or `#{port}`. Defaults to `#{port}`. Only supported if `default_action_type` is `REDIRECT_301` or `REDIRECT_302`.
     (Optional) `path` - The absolute path of the redirect url, starting with the leading `/`. This component is not percent-encoded. The path can contain `#{host}`, `#{path}`, and `#{port}`. Defaults to `/#{path}`. Only supported if `default_action_type` is `REDIRECT_301` or `REDIRECT_302`.
     (Optional) `query` - The query parameters of the redirect url, URL-encoded when necessary, but not percent-encoded. Do not include the leading `?`. Defaults to `#{query}`. Only supported if `default_action_type` is `REDIRECT_301` or `REDIRECT_302`.
-    (Required) `target_group` - The name of the target group to which to route traffic. Use to route to a single target group. To route to one or more target groups, use `default_action_type` as `WEIGHTED_FORWARD`. Only supported if `default_action_type` is `FORWARD`.
+    (Required) `target_group` - The ARN of the target group to which to route traffic. Use to route to a single target group. To route to one or more target groups, use `default_action_type` as `WEIGHTED_FORWARD`. Only supported if `default_action_type` is `FORWARD`.
     (Required) `targets` - A list of target configurations to route traffic. To route to a single target group, use `default_action_type` as `FORWARD`. Only supported if `default_action_type` is `WEIGHTED_FORWARD`. Each item of `targets` block as defined below.
-      (Required) `target_group` - The name of the target group to which to route traffic.
+      (Required) `target_group` - The ARN of the target group to which to route traffic.
       (Optional) `weight` - The weight to use routing traffic to `target_group`. Valid value is `0` to `999`. Defaults to `1`.
     (Optional) `stickiness_duration` - The duration of the session, in seconds, during which requests from a client should be routed to the same target group. Individual target stickiness is a configuration of the target group. Valid values are from `0` to `604800` (7 days). Specify `0` if you want to disable the stickiness. Defaults to `0`. Only supported if `default_action_type` is `WEIGHTED_FORWARD`.
   EOF
@@ -85,7 +85,8 @@ variable "default_action_parameters" {
 
 variable "rules" {
   description = <<EOF
-  (Optional) The rules that you define for the listener determine how the load balancer routes requests to the targets in one or more target groups. Each rule consists of a priority, one or more actions, and one or more conditions. Each key is a `priority` which is used to order rules. Each item of `default_action_parameters` block as defined below.
+  (Optional) The rules that you define for the listener determine how the load balancer routes requests to the targets in one or more target groups. Each rule consists of a priority, one or more actions, and one or more conditions. Each item of `rules` block as defined below.
+    (Required) `priority` - The priority for the rule between `1` and `50000`. A listener can't have multiple rules with the same priority.
     (Required) `conditions` - A set of conditions of the rule. One or more condition blocks can be set per rule. Most condition types can only be specified once per rule except for `HTTP_HEADER` and `QUERY` which can be specified multiple times. All condition blocks must be satisfied for the rule to match. Each item of `conditions` block as defined below.
       (Required) `type` - The type of the condition. Valid values are `HOST`, `HTTP_METHOD`, `HTTP_HEADER`, `PATH`, `QUERY` and `SOURCE_IP`.
       (Optional) `name` - The name of HTTP header to search. The maximum size is 40 characters. Comparison is case insensitive. Only RFC7240 characters are supported. Wildcards are not supported. You cannot use HTTP header condition to specify the host header, use a `HOST` condition instead. Only required if `type` is `HTTP_HEADER`.
@@ -105,6 +106,8 @@ variable "rules" {
     condition = alltrue([
       for rule in var.rules :
       alltrue([
+        rule.priority >= 1,
+        rule.priority <= 50000,
         length(rule.conditions) >= 1,
         length(rule.conditions) <= 5,
         alltrue([

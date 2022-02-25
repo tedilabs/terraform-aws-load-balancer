@@ -73,8 +73,9 @@ module "alb" {
         {"status":"fail","metadata":{"statusCode":"404","code":"UNKNOWN_ENDPOINT","description":"The requested endpoint does not exist."}}
         EOF
       }
-      rules = {
-        10 = {
+      rules = [
+        {
+          priority = 10
           conditions = [
             {
               type   = "HOST"
@@ -83,10 +84,11 @@ module "alb" {
           ]
           action_type = "FORWARD"
           action_parameters = {
-            target_group = module.target_group_alpha.name
+            target_group = module.target_group_alpha.arn
           }
-        }
-        20 = {
+        },
+        {
+          priority = 20
           conditions = [
             {
               type   = "HOST"
@@ -97,17 +99,17 @@ module "alb" {
           action_parameters = {
             targets = [
               {
-                target_group = module.target_group_alpha.name
+                target_group = module.target_group_alpha.arn
                 weight       = 3
               },
               {
-                target_group = module.target_group_beta.name
+                target_group = module.target_group_beta.arn
                 weight       = 1
               },
             ]
           }
         }
-      }
+      ]
     },
   ]
 
@@ -119,11 +121,6 @@ module "alb" {
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
   }
-
-  depends_on = [
-    module.target_group_alpha,
-    module.target_group_beta,
-  ]
 }
 
 

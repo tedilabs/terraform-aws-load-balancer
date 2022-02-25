@@ -31,10 +31,8 @@ output "default_action" {
       ? {
         target_group = [
           for target in [var.default_action_parameters.target_group] : {
-            arn      = data.aws_lb_target_group.this[target].arn
-            name     = data.aws_lb_target_group.this[target].name
-            port     = data.aws_lb_target_group.this[target].port
-            protocol = data.aws_lb_target_group.this[target].protocol
+            arn  = target
+            name = split("/", target)[1]
           }
         ][0]
       }
@@ -44,10 +42,8 @@ output "default_action" {
       targets = [
         for target in var.default_action_parameters.targets : {
           target_group = {
-            arn      = data.aws_lb_target_group.this[target.target_group].arn
-            name     = data.aws_lb_target_group.this[target.target_group].name
-            port     = data.aws_lb_target_group.this[target.target_group].port
-            protocol = data.aws_lb_target_group.this[target.target_group].protocol
+            arn  = target.target_group
+            name = split("/", target.target_group)[1]
           }
           weight = try(target.weight, 1)
         }
@@ -93,67 +89,84 @@ output "tls" {
   } : null
 }
 
+locals {
+  output_rules = {
+    for rule in var.rules :
+    rule.priority => {
+      conditions = rule.conditions
+      action = {
+        type           = rule.action_type
+        parameters     = rule.action_parameters
+        forward        = try(aws_lb_listener_rule.this[rule.priority].action[0].forward[0], null)
+        fixed_response = try(aws_lb_listener_rule.this[rule.priority].action[0].fixed_response[0], null)
+        redirect       = try(aws_lb_listener_rule.this[rule.priority].action[0].redirect, null)
+      }
+    }
+  }
+}
+
 output "rules" {
   description = "The rules of the listener determine how the load balancer routes requests to the targets in one or more target groups."
   value = {
-    for priority, rule in aws_lb_listener_rule.this :
+    for priority, rule in local.output_rules :
     priority => {
-      arn        = rule.arn
-      priority   = rule.priority
-      conditions = var.rules[rule.priority].conditions
+      conditions = rule.conditions
       action = {
-        type = var.rules[rule.priority].action_type
-        forward = (var.rules[rule.priority].action_type == "FORWARD"
+        type = rule.action.type
+        forward = (rule.action.type == "FORWARD"
           ? {
-            target_group = [
-              for target in [var.rules[rule.priority].action_parameters.target_group] : {
-                arn      = data.aws_lb_target_group.this[target].arn
-                name     = data.aws_lb_target_group.this[target].name
-                port     = data.aws_lb_target_group.this[target].port
-                protocol = data.aws_lb_target_group.this[target].protocol
-              }
-            ][0]
+            target_group = {
+              arn  = rule.action.parameters.target_group
+              name = split("/", rule.action.parameters.target_group)[1]
+            }
           }
           : null
         )
-        weighted_forward = try({
-          targets = [
-            for target in var.rules[rule.priority].action_parameters.targets : {
-              target_group = {
-                arn      = data.aws_lb_target_group.this[target.target_group].arn
-                name     = data.aws_lb_target_group.this[target.target_group].name
-                port     = data.aws_lb_target_group.this[target.target_group].port
-                protocol = data.aws_lb_target_group.this[target.target_group].protocol
+        weighted_forward = (rule.action.type == "WEIGHTED_FORWARD"
+          ? {
+            targets = [
+              for target in rule.action.parameters.targets : {
+                target_group = {
+                  arn  = target.target_group
+                  name = split("/", target.target_group)[1]
+                }
+                weight = try(target.weight, 1)
               }
-              weight = try(target.weight, 1)
+            ]
+            stickiness = {
+              enabled  = rule.action.forward.stickiness[0].enabled
+              duration = rule.action.forward.stickiness[0].duration
             }
-          ]
-          stickiness = {
-            enabled  = rule.action[0].forward[0].stickiness[0].enabled
-            duration = rule.action[0].forward[0].stickiness[0].duration
           }
-        }, null)
-        fixed_response = try({
-          status_code  = rule.action[0].fixed_response[0].status_code
-          content_type = rule.action[0].fixed_response[0].content_type
-          data         = rule.action[0].fixed_response[0].message_body
-        }, null)
-        redirect = try({
-          status_code = split("_", rule.action[0].redirect[0].status_code)[1]
-          protocol    = rule.action[0].redirect[0].protocol
-          host        = rule.action[0].redirect[0].host
-          port        = rule.action[0].redirect[0].port
-          path        = rule.action[0].redirect[0].path
-          query       = rule.action[0].redirect[0].query
-          url = format(
-            "%s://%s:%s%s?%s",
-            lower(rule.action[0].redirect[0].protocol),
-            rule.action[0].redirect[0].host,
-            rule.action[0].redirect[0].port,
-            rule.action[0].redirect[0].path,
-            rule.action[0].redirect[0].query,
-          )
-        }, null)
+          : null
+        )
+        fixed_response = (rule.action.type == "FIXED_RESPONSE"
+          ? {
+            status_code  = rule.action.fixed_response.status_code
+            content_type = rule.action.fixed_response.content_type
+            data         = rule.action.fixed_response.message_body
+          }
+          : null
+        )
+        redirect = (contains(["REDIRECT_301", "REDIRECT_302"], rule.action.type)
+          ? {
+            status_code = split("_", rule.action.redirect.status_code)[1]
+            protocol    = rule.action.redirect.protocol
+            host        = rule.action.redirect.host
+            port        = rule.action.redirect.port
+            path        = rule.action.redirect.path
+            query       = rule.action.redirect.query
+            url = format(
+              "%s://%s:%s%s?%s",
+              lower(rule.action.redirect.protocol),
+              rule.action.redirect.host,
+              rule.action.redirect.port,
+              rule.action.redirect.path,
+              rule.action.redirect.query,
+            )
+          }
+          : null
+        )
       }
     }
   }
