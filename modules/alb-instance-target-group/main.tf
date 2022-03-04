@@ -34,7 +34,13 @@ resource "aws_lb_target_group" "this" {
   deregistration_delay          = var.deregistration_delay
   load_balancing_algorithm_type = lower(var.load_balancing_algorithm)
   slow_start                    = var.slow_start_duration
-  # - `stickiness`
+
+  stickiness {
+    enabled         = var.stickiness_enabled
+    type            = lower(var.stickiness_type)
+    cookie_duration = var.stickiness_duration
+    cookie_name     = var.stickiness_type == "APP_COOKIE" ? var.stickiness_cookie : null
+  }
 
   health_check {
     enabled = true
