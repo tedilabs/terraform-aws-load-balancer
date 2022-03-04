@@ -43,7 +43,6 @@ resource "aws_lb_target_group" "this" {
     type    = "source_ip"
   }
 
-
   ## INFO: Not supported attributes
   # - `timeout`
   dynamic "health_check" {

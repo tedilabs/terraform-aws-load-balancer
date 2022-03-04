@@ -93,6 +93,43 @@ variable "slow_start_duration" {
   }
 }
 
+variable "stickiness_enabled" {
+  description = "(Optional) Whether to enable the type of stickiness associated with this target group. If enabled, the load balancer binds a client’s session to a specific instance within the target group. Defaults to `false`."
+  type        = bool
+  default     = false
+}
+
+variable "stickiness_type" {
+  description = "(Optional) The type of sticky sessions. Valid values are `LB_COOKIE` or `APP_COOKIE`. Defaults to `LB_COOKIE`."
+  type        = string
+  default     = "LB_COOKIE"
+
+  validation {
+    condition     = contains(["LB_COOKIE", "APP_COOKIE"], var.stickiness_type)
+    error_message = "Valid values are `LB_COOKIE` or `APP_COOKIE`."
+  }
+}
+
+variable "stickiness_duration" {
+  description = "(Optional) The time period, in seconds, during which requests from a client should be routed to the same target. After this time period expires, the load balancer-generated cookie is considered stale. Valid values are from `1` to `604800` (1 week). Defaults to `86400` (1 day)."
+  type        = number
+  default     = 86400
+
+  validation {
+    condition = alltrue([
+      var.stickiness_duration >= 1,
+      var.stickiness_duration <= 604800,
+    ])
+    error_message = "Valid values are from `1` to `604800` (1 week)."
+  }
+}
+
+variable "stickiness_cookie" {
+  description = "(Optional) The name of the application based cookie. `AWSALB`, `AWSALBAPP`, and `AWSALBTG` prefixes are reserved and cannot be used. Only needed when `stickiness_type` is `APP_COOKIE`."
+  type        = string
+  default     = null
+}
+
 variable "health_check" {
   description = <<EOF
   (Optional) Health Check configuration block. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.

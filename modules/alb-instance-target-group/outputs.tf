@@ -59,7 +59,12 @@ output "attributes" {
     deregistration_delay     = aws_lb_target_group.this.deregistration_delay
     load_balancing_algorithm = upper(aws_lb_target_group.this.load_balancing_algorithm_type)
     slow_start_duration      = aws_lb_target_group.this.slow_start
-    stickiness               = aws_lb_target_group.this.stickiness[0]
+    stickiness = {
+      enabled  = aws_lb_target_group.this.stickiness[0].enabled
+      type     = upper(aws_lb_target_group.this.stickiness[0].type)
+      duration = aws_lb_target_group.this.stickiness[0].cookie_duration
+      cookie   = var.stickiness_cookie
+    }
   }
 }
 

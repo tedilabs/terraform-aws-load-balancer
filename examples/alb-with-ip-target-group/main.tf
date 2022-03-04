@@ -146,6 +146,10 @@ module "target_group_alpha" {
   load_balancing_algorithm = "ROUND_ROBIN"
   slow_start_duration      = 0
 
+  stickiness_enabled  = true
+  stickiness_type     = "LB_COOKIE"
+  stickiness_duration = 86400
+
   targets = [
     {
       ip_address = "10.123.123.234"
@@ -188,6 +192,11 @@ module "target_group_beta" {
   deregistration_delay     = 300
   load_balancing_algorithm = "ROUND_ROBIN"
   slow_start_duration      = 0
+
+  stickiness_enabled  = true
+  stickiness_type     = "APP_COOKIE"
+  stickiness_duration = 86400
+  stickiness_cookie   = "X-TEDILABS-SESSION"
 
   targets = [
     {

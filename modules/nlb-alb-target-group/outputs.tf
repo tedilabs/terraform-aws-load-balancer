@@ -56,7 +56,10 @@ output "attributes" {
   value = {
     deregistration_delay = aws_lb_target_group.this.deregistration_delay
     preserve_client_ip   = aws_lb_target_group.this.preserve_client_ip
-    stickiness           = aws_lb_target_group.this.stickiness[0]
+    stickiness = {
+      enabled = aws_lb_target_group.this.stickiness[0].enabled
+      type    = upper(aws_lb_target_group.this.stickiness[0].type)
+    }
   }
 }
 

@@ -36,6 +36,8 @@ resource "aws_lb_target_group" "this" {
   # deregistration_delay = 300
   # preserve_client_ip = true
   # stickiness {
+  #   enabled = false
+  #   type    = "source_ip"
   # }
 
   ## INFO: Not supported attributes
