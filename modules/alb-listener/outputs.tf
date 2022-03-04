@@ -99,7 +99,7 @@ locals {
         parameters     = rule.action_parameters
         forward        = try(aws_lb_listener_rule.this[rule.priority].action[0].forward[0], null)
         fixed_response = try(aws_lb_listener_rule.this[rule.priority].action[0].fixed_response[0], null)
-        redirect       = try(aws_lb_listener_rule.this[rule.priority].action[0].redirect, null)
+        redirect       = try(aws_lb_listener_rule.this[rule.priority].action[0].redirect[0], null)
       }
     }
   }
