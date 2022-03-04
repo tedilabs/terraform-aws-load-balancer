@@ -76,6 +76,7 @@ module "target_group" {
   deregistration_delay                   = 300
   preserve_client_ip                     = true
   proxy_protocol_v2                      = false
+  stickiness_enabled                     = true
 
   targets = [
     # {
