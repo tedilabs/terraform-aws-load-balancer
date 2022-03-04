@@ -55,7 +55,14 @@ resource "aws_lb_target_group" "this" {
   deregistration_delay   = var.deregistration_delay
   preserve_client_ip     = var.preserve_client_ip
   proxy_protocol_v2      = var.proxy_protocol_v2
-  # - `stickiness`
+
+  ## INFO: Not supported attributes
+  # - `cookie_duration`
+  # - `cookie_name`
+  stickiness {
+    enabled = var.stickiness_enabled
+    type    = "source_ip"
+  }
 
   ## INFO: Not supported attributes
   # - `timeout`

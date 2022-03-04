@@ -75,6 +75,12 @@ variable "proxy_protocol_v2" {
   default     = false
 }
 
+variable "stickiness_enabled" {
+  description = "(Optional) Whether to enable the type of stickiness associated with this target group. If enabled, the load balancer binds a client’s session to a specific instance within the target group. Defaults to `false`."
+  type        = bool
+  default     = false
+}
+
 variable "health_check" {
   description = <<EOF
   (Optional) Health Check configuration block. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.
