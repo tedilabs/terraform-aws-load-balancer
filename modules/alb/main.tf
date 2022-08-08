@@ -82,6 +82,7 @@ resource "aws_lb" "this" {
   enable_http2               = var.http2_enabled
   enable_waf_fail_open       = var.waf_fail_open_enabled
   idle_timeout               = var.idle_timeout
+  preserve_host_header       = var.preserve_host_header
 
   tags = merge(
     {

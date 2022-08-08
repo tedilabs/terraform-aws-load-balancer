@@ -1,6 +1,7 @@
 variable "name" {
   description = "(Required) The name of the load balancer. This name must be unique within your AWS account, can have a maximum of 32 characters, must contain only alphanumeric characters or hyphens, and must not begin or end with a hyphen."
   type        = string
+  nullable    = false
 
   validation {
     condition     = length(var.name) <= 32
@@ -12,12 +13,14 @@ variable "is_public" {
   description = "(Optional) Indicates whether the load balancer will be public. Defaults to `false`."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "ip_address_type" {
   description = "(Optional) The type of IP addresses used by the subnets for your load balancer. The possible values are `IPV4` and `DUALSTACK`."
   type        = string
   default     = "IPV4"
+  nullable    = false
 
   validation {
     condition     = contains(["IPV4", "DUALSTACK"], var.ip_address_type)
@@ -37,12 +40,14 @@ variable "default_security_group" {
   EOF
   type        = any
   default     = {}
+  nullable    = false
 }
 
 variable "security_groups" {
   description = "(Optional) A set of security group IDs to assign to the load balancer."
   type        = set(string)
   default     = []
+  nullable    = false
 }
 
 variable "vpc_id" {
@@ -57,12 +62,14 @@ variable "network_mapping" {
   EOF
   type        = map(map(string))
   default     = {}
+  nullable    = false
 }
 
 variable "access_log_enabled" {
   description = "(Optional) Indicates whether to enable access logs. Defaults to `false`, even when bucket is specified."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "access_log_s3_bucket" {
@@ -74,13 +81,15 @@ variable "access_log_s3_bucket" {
 variable "access_log_s3_key_prefix" {
   description = "(Optional) The key prefix for the specified S3 bucket."
   type        = string
-  default     = null
+  default     = ""
+  nullable    = false
 }
 
 variable "desync_mitigation_mode" {
   description = "(Optional) Determines how the load balancer handles requests that might pose a security risk to your application. Valid values are `DEFENSIVE`, `STRICTEST` and `MONITOR`. Defaults to `DEFENSIVE`."
   type        = string
   default     = "DEFENSIVE"
+  nullable    = false
 
   validation {
     condition     = contains(["DEFENSIVE", "STRICTEST", "MONITOR"], var.desync_mitigation_mode)
@@ -92,30 +101,42 @@ variable "drop_invalid_header_fields" {
   description = "(Optional) Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). Elastic Load Balancing requires that message header names contain only alphanumeric characters and hyphens. Defaults to `false`."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "deletion_protection_enabled" {
   description = "(Optional) Indicates whether deletion of the load balancer via the AWS API will be protected. Defaults to `false`."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "http2_enabled" {
   description = "(Optional) Indicates whether HTTP/2 is enabled. Defaults to `true`."
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "waf_fail_open_enabled" {
   description = "(Optional) Indicates whether to allow a WAF-enabled load balancer to route requests to targets if it is unable to forward the request to AWS WAF. Defaults to `false`."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "idle_timeout" {
   description = "(Optional) The number of seconds before the load balancer determines the connection is idle and closes it. Defaults to `60`"
   type        = number
   default     = 60
+  nullable    = false
+}
+
+variable "preserve_host_header" {
+  description = "(Optional) Indicates whether the Application Load Balancer should preserve the Host header in the HTTP request and send it to the target without any change. Defaults to `false`."
+  type        = bool
+  default     = false
+  nullable    = false
 }
 
 variable "listeners" {
@@ -132,18 +153,21 @@ variable "listeners" {
   EOF
   type        = any
   default     = []
+  nullable    = false
 }
 
 variable "tags" {
   description = "(Optional) A map of tags to add to all resources."
   type        = map(string)
   default     = {}
+  nullable    = false
 }
 
 variable "module_tags_enabled" {
   description = "(Optional) Whether to create AWS Resource Tags for the module informations."
   type        = bool
   default     = true
+  nullable    = false
 }
 
 
@@ -155,12 +179,14 @@ variable "resource_group_enabled" {
   description = "(Optional) Whether to create Resource Group to find and group AWS resources which are created by this module."
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "resource_group_name" {
   description = "(Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`."
   type        = string
   default     = ""
+  nullable    = false
 }
 
 variable "resource_group_description" {

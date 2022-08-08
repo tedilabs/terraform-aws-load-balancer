@@ -1,6 +1,7 @@
 variable "name" {
   description = "(Required) Name of the target group. A maximum of 32 alphanumeric characters including hyphens are allowed, but the name must not begin or end with a hyphen."
   type        = string
+  nullable    = false
 
   validation {
     condition     = length(var.name) <= 32
@@ -16,6 +17,7 @@ variable "vpc_id" {
 variable "port" {
   description = "(Required) The number of port on which targets receive traffic, unless overridden when registering a specific target. Valid values are either ports 1-65535."
   type        = number
+  nullable    = false
 
   validation {
     condition = alltrue([
@@ -29,6 +31,7 @@ variable "port" {
 variable "protocol" {
   description = "(Required) The protocol to use for routing traffic to the targets. Valid values are `HTTP` and `HTTPS`. Defaults to `HTTP`."
   type        = string
+  nullable    = false
 
   validation {
     condition     = contains(["HTTP", "HTTPS"], var.protocol)
@@ -40,6 +43,7 @@ variable "protocol_version" {
   description = "(Optional) Use `HTTP1` to send requests to targets using HTTP/1.1. Supported when the request protocol is HTTP/1.1 or HTTP/2. Use `HTTP2` to send requests to targets using HTTP/2. Supported when the request protocol is HTTP/2 or gRPC, but gRPC-specific features are not available. Use `GRPC` to send requests to targets using gRPC. Supported when the request protocol is gRPC. Defaults to `HTTP1`."
   type        = string
   default     = "HTTP1"
+  nullable    = false
 
   validation {
     condition     = contains(["HTTP1", "HTTP2", "GRPC"], var.protocol_version)
@@ -55,12 +59,14 @@ variable "targets" {
   EOF
   type        = set(map(string))
   default     = []
+  nullable    = false
 }
 
 variable "deregistration_delay" {
   description = "(Optional) The time to wait for in-flight requests to complete while deregistering a target. During this time, the state of the target is draining."
   type        = number
   default     = 300
+  nullable    = false
 
   validation {
     condition     = var.deregistration_delay <= 3600 && var.deregistration_delay >= 0
@@ -72,6 +78,7 @@ variable "load_balancing_algorithm" {
   description = "(Optional) Determines how the load balancer selects targets when routing requests. Valid values are `ROUND_ROBIN` or `LEAST_OUTSTANDING_REQUESTS`. Defaults to `ROUND_ROBIN`."
   type        = string
   default     = "ROUND_ROBIN"
+  nullable    = false
 
   validation {
     condition     = contains(["ROUND_ROBIN", "LEAST_OUTSTANDING_REQUESTS"], var.load_balancing_algorithm)
@@ -83,6 +90,7 @@ variable "slow_start_duration" {
   description = "(Optional) The amount time for a newly registered targets to warm up before the load balancer sends them a full share of requests. During this period, targets receives an increasing share of requests until it reaches its fair share. Requires `30` to `900` seconds to enable, or `0` seconds to disable. This attribute cannot be combined with the Least outstanding requests algorithm."
   type        = number
   default     = 0
+  nullable    = false
 
   validation {
     condition = anytrue([
@@ -97,12 +105,14 @@ variable "stickiness_enabled" {
   description = "(Optional) Whether to enable the type of stickiness associated with this target group. If enabled, the load balancer binds a client’s session to a specific instance within the target group. Defaults to `false`."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "stickiness_type" {
   description = "(Optional) The type of sticky sessions. Valid values are `LB_COOKIE` or `APP_COOKIE`. Defaults to `LB_COOKIE`."
   type        = string
   default     = "LB_COOKIE"
+  nullable    = false
 
   validation {
     condition     = contains(["LB_COOKIE", "APP_COOKIE"], var.stickiness_type)
@@ -114,6 +124,7 @@ variable "stickiness_duration" {
   description = "(Optional) The time period, in seconds, during which requests from a client should be routed to the same target. After this time period expires, the load balancer-generated cookie is considered stale. Valid values are from `1` to `604800` (1 week). Defaults to `86400` (1 day)."
   type        = number
   default     = 86400
+  nullable    = false
 
   validation {
     condition = alltrue([
@@ -144,6 +155,7 @@ variable "health_check" {
   EOF
   type        = any
   default     = {}
+  nullable    = false
 
   validation {
     condition = alltrue([
@@ -168,12 +180,14 @@ variable "tags" {
   description = "(Optional) A map of tags to add to all resources."
   type        = map(string)
   default     = {}
+  nullable    = false
 }
 
 variable "module_tags_enabled" {
   description = "(Optional) Whether to create AWS Resource Tags for the module informations."
   type        = bool
   default     = true
+  nullable    = false
 }
 
 
@@ -185,16 +199,19 @@ variable "resource_group_enabled" {
   description = "(Optional) Whether to create Resource Group to find and group AWS resources which are created by this module."
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "resource_group_name" {
   description = "(Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`."
   type        = string
   default     = ""
+  nullable    = false
 }
 
 variable "resource_group_description" {
   description = "(Optional) The description of Resource Group."
   type        = string
   default     = "Managed by Terraform."
+  nullable    = false
 }
