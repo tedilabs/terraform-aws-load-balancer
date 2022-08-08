@@ -104,6 +104,7 @@ output "attributes" {
     http2_enabled               = aws_lb.this.enable_http2
     waf_fail_open_enabled       = aws_lb.this.enable_waf_fail_open
     idle_timeout                = aws_lb.this.idle_timeout
+    preserve_host_header        = aws_lb.this.preserve_host_header
   }
 }
 

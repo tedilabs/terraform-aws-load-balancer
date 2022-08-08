@@ -1,6 +1,7 @@
 variable "name" {
   description = "(Required) Name of the target group. A maximum of 32 alphanumeric characters including hyphens are allowed, but the name must not begin or end with a hyphen."
   type        = string
+  nullable    = false
 
   validation {
     condition     = length(var.name) <= 32
@@ -16,6 +17,7 @@ variable "vpc_id" {
 variable "port" {
   description = "(Required) The number of port on which targets receive traffic, unless overridden when registering a specific target. Valid values are either ports 1-65535."
   type        = number
+  nullable    = false
 
   validation {
     condition = alltrue([
@@ -29,6 +31,7 @@ variable "port" {
 variable "protocol" {
   description = "(Required) The protocol to use for routing traffic to the targets. Valid values are `TCP`, `TLS`, `UDP` and `TCP_UDP`. Not valid to use `UDP` or `TCP_UDP` if dual-stack mode is enabled on the load balancer."
   type        = string
+  nullable    = false
 
   validation {
     condition     = contains(["TCP", "TLS", "UDP", "TCP_UDP"], var.protocol)
@@ -44,18 +47,21 @@ variable "targets" {
   EOF
   type        = set(map(string))
   default     = []
+  nullable    = false
 }
 
 variable "terminate_connection_on_deregistration" {
   description = "(Optional) Whether to terminate active connections at the end of the deregistration timeout is reached on Network Load Balancers. Enabling this setting is particularly important for `UDP` and `TCP_UDP` target groups. Defaults to `false`."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "deregistration_delay" {
   description = "(Optional) The time to wait for in-flight requests to complete while deregistering a target. During this time, the state of the target is draining."
   type        = number
   default     = 300
+  nullable    = false
 
   validation {
     condition     = var.deregistration_delay <= 3600 && var.deregistration_delay >= 0
@@ -67,18 +73,21 @@ variable "preserve_client_ip" {
   description = "(Optional) Whether to preserve client IP addresses and ports in the packets forwarded to targets. Client IP preservation cannot be disabled if the target group protocol is `UDP` and `TCP_UDP`. Defaults to `true`."
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "proxy_protocol_v2" {
   description = "(Optional) Whether to enable support for proxy protocol v2 on Network Load Balancers. Before you enable proxy protocol v2, make sure that your application targets can process proxy protocol headers otherwise your application might break. Defaults to `false`."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "stickiness_enabled" {
   description = "(Optional) Whether to enable the type of stickiness associated with this target group. If enabled, the load balancer binds a client’s session to a specific instance within the target group. Defaults to `false`."
   type        = bool
   default     = false
+  nullable    = false
 }
 
 variable "health_check" {
@@ -94,6 +103,7 @@ variable "health_check" {
   EOF
   type        = any
   default     = {}
+  nullable    = false
 
   validation {
     condition = alltrue([
@@ -115,12 +125,14 @@ variable "tags" {
   description = "(Optional) A map of tags to add to all resources."
   type        = map(string)
   default     = {}
+  nullable    = false
 }
 
 variable "module_tags_enabled" {
   description = "(Optional) Whether to create AWS Resource Tags for the module informations."
   type        = bool
   default     = true
+  nullable    = false
 }
 
 
@@ -132,16 +144,19 @@ variable "resource_group_enabled" {
   description = "(Optional) Whether to create Resource Group to find and group AWS resources which are created by this module."
   type        = bool
   default     = true
+  nullable    = false
 }
 
 variable "resource_group_name" {
   description = "(Optional) The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`."
   type        = string
   default     = ""
+  nullable    = false
 }
 
 variable "resource_group_description" {
   description = "(Optional) The description of Resource Group."
   type        = string
   default     = "Managed by Terraform."
+  nullable    = false
 }
