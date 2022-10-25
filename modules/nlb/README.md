@@ -18,20 +18,20 @@ This module creates following resources.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.0.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.36.1 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_listener"></a> [listener](#module\_listener) | ../nlb-listener | n/a |
+| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | tedilabs/misc/aws//modules/resource-group | ~> 0.10.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
 | [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
-| [aws_resourcegroups_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/resourcegroups_group) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_subnet.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 
@@ -42,7 +42,7 @@ This module creates following resources.
 | <a name="input_name"></a> [name](#input\_name) | (Required) The name of the load balancer. This name must be unique within your AWS account, can have a maximum of 32 characters, must contain only alphanumeric characters or hyphens, and must not begin or end with a hyphen. | `string` | n/a | yes |
 | <a name="input_access_log_enabled"></a> [access\_log\_enabled](#input\_access\_log\_enabled) | (Optional) Indicates whether to enable access logs. Defaults to `false`, even when bucket is specified. | `bool` | `false` | no |
 | <a name="input_access_log_s3_bucket"></a> [access\_log\_s3\_bucket](#input\_access\_log\_s3\_bucket) | (Optional) The name of the S3 bucket used to store the access logs. | `string` | `null` | no |
-| <a name="input_access_log_s3_key_prefix"></a> [access\_log\_s3\_key\_prefix](#input\_access\_log\_s3\_key\_prefix) | (Optional) The key prefix for the specified S3 bucket. | `string` | `null` | no |
+| <a name="input_access_log_s3_key_prefix"></a> [access\_log\_s3\_key\_prefix](#input\_access\_log\_s3\_key\_prefix) | (Optional) The key prefix for the specified S3 bucket. | `string` | `""` | no |
 | <a name="input_cross_zone_load_balancing_enabled"></a> [cross\_zone\_load\_balancing\_enabled](#input\_cross\_zone\_load\_balancing\_enabled) | (Optional) Cross-zone load balancing distributes traffic evenly across all targets in the Availability Zones enabled for the load balancer. Indicates whether to enable cross-zone load balancing. Defaults to `false`. Regional data transfer charges may apply when cross-zone load balancing is enabled. | `bool` | `false` | no |
 | <a name="input_deletion_protection_enabled"></a> [deletion\_protection\_enabled](#input\_deletion\_protection\_enabled) | (Optional) Indicates whether deletion of the load balancer via the AWS API will be protected. Defaults to `false`. | `bool` | `false` | no |
 | <a name="input_ip_address_type"></a> [ip\_address\_type](#input\_ip\_address\_type) | (Optional) The type of IP addresses used by the subnets for your load balancer. The possible values are `IPV4` and `DUALSTACK`. | `string` | `"IPV4"` | no |
