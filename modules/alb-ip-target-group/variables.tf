@@ -14,6 +14,18 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "ip_address_type" {
+  description = "(Required) The type of IP addresses used by the target group. Valid values are `IPV4` or `IPV6`."
+  type        = string
+  default     = "IPV4"
+  nullable    = false
+
+  validation {
+    condition     = contains(["IPV4", "IPV6"], var.ip_address_type)
+    error_message = "Valid values are `IPV4` or `IPV6`."
+  }
+}
+
 variable "port" {
   description = "(Required) The number of port on which targets receive traffic, unless overridden when registering a specific target. Valid values are either ports 1-65535."
   type        = number

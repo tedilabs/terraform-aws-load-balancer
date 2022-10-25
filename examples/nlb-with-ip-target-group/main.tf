@@ -68,8 +68,9 @@ module "target_group" {
 
   vpc_id = data.aws_vpc.default.id
 
-  port     = 80
-  protocol = "TCP"
+  ip_address_type = "IPV4"
+  port            = 80
+  protocol        = "TCP"
 
   ## Attributes
   terminate_connection_on_deregistration = false
