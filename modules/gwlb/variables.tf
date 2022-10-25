@@ -43,8 +43,8 @@ variable "listeners" {
     port         = number
     target_group = string
   }))
-  default = []
-  nullable    = false
+  default  = []
+  nullable = false
 
   validation {
     condition     = length(var.listeners) <= 1

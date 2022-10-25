@@ -22,8 +22,8 @@ variable "targets" {
   type = set(object({
     ip_address = string
   }))
-  default = []
-  nullable    = false
+  default  = []
+  nullable = false
 }
 
 variable "deregistration_delay" {
