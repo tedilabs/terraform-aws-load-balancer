@@ -17,6 +17,7 @@ locals {
 
 # INFO: Not supported attributes
 # - `connection_termination`
+# - `ip_address_type`
 # - `lambda_multi_value_headers_enabled`
 # - `preserve_client_ip`
 # - `proxy_protocol_v2`

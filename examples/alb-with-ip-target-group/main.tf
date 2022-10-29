@@ -137,6 +137,7 @@ module "target_group_alpha" {
 
   vpc_id = data.aws_vpc.default.id
 
+  ip_address_type  = "IPV4"
   port             = 80
   protocol         = "HTTP"
   protocol_version = "HTTP1"
@@ -184,6 +185,7 @@ module "target_group_beta" {
 
   vpc_id = data.aws_vpc.default.id
 
+  ip_address_type  = "IPV4"
   port             = 80
   protocol         = "HTTP"
   protocol_version = "HTTP1"

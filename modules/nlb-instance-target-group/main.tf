@@ -16,6 +16,7 @@ locals {
 
 
 # INFO: Not supported attributes
+# - `ip_address_type`
 # - `lambda_multi_value_headers_enabled`
 # - `load_balancing_algorithm_type`
 # - `protocol_version`

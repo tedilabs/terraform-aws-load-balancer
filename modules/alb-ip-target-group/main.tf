@@ -47,6 +47,7 @@ resource "aws_lb_target_group" "this" {
   vpc_id = var.vpc_id
 
   target_type      = "ip"
+  ip_address_type  = lower(var.ip_address_type)
   port             = var.port
   protocol         = var.protocol
   protocol_version = var.protocol_version

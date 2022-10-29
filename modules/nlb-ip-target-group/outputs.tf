@@ -28,6 +28,11 @@ output "type" {
   value       = upper(aws_lb_target_group.this.target_type)
 }
 
+output "ip_address_type" {
+  description = "The type of IP addresses used by the target group."
+  value       = upper(aws_lb_target_group.this.ip_address_type)
+}
+
 output "port" {
   description = "The port number on which the target receive trrafic."
   value       = aws_lb_target_group.this.port
