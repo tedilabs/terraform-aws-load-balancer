@@ -162,13 +162,15 @@ module "target_group_alpha" {
   ]
 
   health_check = {
-    port                = 80
-    protocol            = "HTTP"
+    protocol      = "HTTP"
+    port          = 80
+    port_override = false
+    path          = "/health"
+
     interval            = 10
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
-    path                = "/health"
   }
 
   tags = {
@@ -207,13 +209,15 @@ module "target_group_beta" {
   ]
 
   health_check = {
-    port                = 80
-    protocol            = "HTTP"
+    protocol      = "HTTP"
+    port          = 80
+    port_override = false
+    path          = "/health"
+
     interval            = 10
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
-    path                = "/health"
   }
 
   tags = {

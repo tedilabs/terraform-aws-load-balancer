@@ -77,15 +77,14 @@ output "attributes" {
 output "health_check" {
   description = "Health Check configuration of the target group."
   value = {
-    protocol = aws_lb_target_group.this.health_check[0].protocol
-    port     = aws_lb_target_group.this.health_check[0].port
+    protocol      = aws_lb_target_group.this.health_check[0].protocol
+    port          = aws_lb_target_group.this.health_check[0].port
+    path          = aws_lb_target_group.this.health_check[0].path
+    success_codes = aws_lb_target_group.this.health_check[0].matcher
 
     healthy_threshold   = aws_lb_target_group.this.health_check[0].healthy_threshold
     unhealthy_threshold = aws_lb_target_group.this.health_check[0].unhealthy_threshold
     interval            = aws_lb_target_group.this.health_check[0].interval
     timeout             = aws_lb_target_group.this.health_check[0].timeout
-
-    success_codes = aws_lb_target_group.this.health_check[0].matcher
-    path          = aws_lb_target_group.this.health_check[0].path
   }
 }

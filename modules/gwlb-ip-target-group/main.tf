@@ -67,7 +67,7 @@ resource "aws_lb_target_group" "this" {
   dynamic "health_check" {
     for_each = [merge(
       var.health_check,
-      try(var.health_check.protocol, "TCP") != "TCP"
+      var.health_check.protocol != "TCP"
       ? {
         success_codes = "200-399"
       }
@@ -82,16 +82,18 @@ resource "aws_lb_target_group" "this" {
     content {
       enabled = true
 
-      port     = try(health_check.value.port, local.port)
-      protocol = try(health_check.value.protocol, "TCP")
-
-      healthy_threshold   = try(health_check.value.healthy_threshold, 3)
-      unhealthy_threshold = try(health_check.value.unhealthy_threshold, 3)
-      interval            = try(health_check.value.interval, 30)
-      timeout             = try(health_check.value.timeout, 10)
-
+      protocol = health_check.value.protocol
+      port = (health_check.value.port_override
+        ? health_check.value.port
+        : "traffic-port"
+      )
+      path    = health_check.value.path
       matcher = health_check.value.success_codes
-      path    = try(health_check.value.path, "/")
+
+      healthy_threshold   = health_check.value.healthy_threshold
+      unhealthy_threshold = health_check.value.unhealthy_threshold
+      interval            = health_check.value.interval
+      timeout             = health_check.value.timeout
     }
   }
 

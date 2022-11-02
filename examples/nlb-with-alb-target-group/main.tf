@@ -76,12 +76,14 @@ module "target_group" {
   ]
 
   health_check = {
-    port                = 80
-    protocol            = "HTTP"
+    protocol      = "HTTP"
+    port          = 80
+    port_override = false
+    path          = "/ping"
+
     interval            = 10
     healthy_threshold   = 3
     unhealthy_threshold = 3
-    path                = "/ping"
   }
 
   tags = {

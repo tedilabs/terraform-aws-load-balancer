@@ -14,9 +14,11 @@ variable "targets" {
   (Optional) A list of targets to add to the target group. The Lambda target group is limited to a single Lambda function target. The load balancer starts routing requests to a newly registered target as soon as the registration process completes and the target passes the initial health checks (if enabled). Each value of `targets` block as defined below.
     (Required) `lambda_function` - The Amazon Resource Name (ARN) of the target Lambda. If your ARN does not specify a version or alias, the latest version ($LATEST) will be used by default. ARNs that specify a version / alias do so after the function name, and are separated by a colon.
   EOF
-  type        = list(map(string))
-  default     = []
-  nullable    = false
+  type = set(object({
+    lambda_function = string
+  }))
+  default  = []
+  nullable = false
 
   validation {
     condition     = length(var.targets) <= 1
@@ -35,28 +37,37 @@ variable "health_check" {
   description = <<EOF
   (Optional) Health Check configuration block. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.
     (Optional) `enabled` - Whether health checks are enabled. Health checks count as a request for your Lambda function. Defaults to `false`.
+    (Optional) `path` - Use the default path of `/` to ping the root, or specify a custom path if preferred.
+    (Optional) `success_codes` - The HTTP codes to use when checking for a successful response from a target. You can specify multiple values (for example, `200,202`) or a range of values (for example, `200-299`). Defaults to `200`.
     (Optional) `healthy_threshold` - The number of consecutive health checks successes required before considering an unhealthy target healthy. Valid value range is 2 - 10. Defaults to `5`.
     (Optional) `unhealthy_threshold` - The number of consecutive health check failures required before considering a target unhealthy. Valid value range is 2 - 10. Defaults to `2`.
     (Optional) `interval` - Approximate amount of time, in seconds, between health checks of an individual target. Valid value range is 5 - 300. Defaults to `35`.
     (Optional) `timeout` - The amount of time, in seconds, during which no response means a failed health check. Valid value range is 2 - 120. Defaults to `30`.
-    (Optional) `success_codes` - The HTTP codes to use when checking for a successful response from a target. You can specify multiple values (for example, `200,202`) or a range of values (for example, `200-299`). Defaults to `200`.
-    (Optional) `path` - Use the default path of `/` to ping the root, or specify a custom path if preferred.
   EOF
-  type        = any
-  default     = {}
-  nullable    = false
+  type = object({
+    enabled       = optional(bool, false)
+    path          = optional(string, "/")
+    success_codes = optional(string, "200")
+
+    healthy_threshold   = optional(number, 5)
+    unhealthy_threshold = optional(number, 2)
+    interval            = optional(number, 35)
+    timeout             = optional(number, 30)
+  })
+  default  = {}
+  nullable = false
 
   validation {
     condition = alltrue([
-      try(var.health_check.healthy_threshold, 5) <= 10,
-      try(var.health_check.healthy_threshold, 5) >= 2,
-      try(var.health_check.unhealthy_threshold, 2) <= 10,
-      try(var.health_check.unhealthy_threshold, 2) >= 2,
-      try(var.health_check.interval, 30) >= 5,
-      try(var.health_check.interval, 30) <= 300,
-      try(var.health_check.timeout, 5) >= 2,
-      try(var.health_check.timeout, 5) <= 120,
-      length(try(var.health_check.path, "/")) <= 1024,
+      length(var.health_check.path) <= 1024,
+      var.health_check.healthy_threshold <= 10,
+      var.health_check.healthy_threshold >= 2,
+      var.health_check.unhealthy_threshold <= 10,
+      var.health_check.unhealthy_threshold >= 2,
+      var.health_check.interval >= 5,
+      var.health_check.interval <= 300,
+      var.health_check.timeout >= 2,
+      var.health_check.timeout <= 120,
     ])
     error_message = "Not valid parameters for `health_check`."
   }

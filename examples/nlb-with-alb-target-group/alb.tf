@@ -44,8 +44,9 @@ module "alb" {
         protocol = "HTTPS"
         port     = 443
       }
-      rules = {
-        10 = {
+      rules = [
+        {
+          priority = 10
           conditions = [
             {
               type   = "PATH"
@@ -61,7 +62,7 @@ module "alb" {
             EOF
           }
         }
-      }
+      ]
     },
     # {
     #   port         = 443
