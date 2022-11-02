@@ -46,15 +46,17 @@ resource "aws_lb_target_group" "this" {
   health_check {
     enabled = true
 
-    port     = try(var.health_check.port, var.port)
-    protocol = try(var.health_check.protocol, "HTTP")
-
-    healthy_threshold   = try(var.health_check.healthy_threshold, 3)
-    unhealthy_threshold = try(var.health_check.unhealthy_threshold, 3)
-    interval            = try(var.health_check.interval, 30)
-
+    protocol = var.health_check.protocol
+    port = (var.health_check.port_override
+      ? coalesce(var.health_check.port, var.port)
+      : "traffic-port"
+    )
+    path    = var.health_check.path
     matcher = "200-399"
-    path    = try(var.health_check.path, "/")
+
+    healthy_threshold   = var.health_check.healthy_threshold
+    unhealthy_threshold = var.health_check.unhealthy_threshold
+    interval            = var.health_check.interval
   }
 
   tags = merge(
@@ -78,6 +80,6 @@ resource "aws_lb_target_group_attachment" "this" {
 
   target_group_arn = aws_lb_target_group.this.arn
 
-  target_id = var.targets[0].alb
+  target_id = tolist(var.targets)[0].alb
   port      = var.port
 }

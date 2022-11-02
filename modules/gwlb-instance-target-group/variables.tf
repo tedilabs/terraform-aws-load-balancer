@@ -41,32 +41,43 @@ variable "deregistration_delay" {
 variable "health_check" {
   description = <<EOF
   (Optional) Health Check configuration block. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.
-    (Optional) `port` - The port the load balancer uses when performing health checks on targets. The default is the port on which each target receives traffic from the load balancer. Valid values are either ports 1-65535.
     (Optional) `protocol` - Protocol to use to connect with the target. The possible values are `TCP`, `HTTP` and `HTTPS`. Defaults to `TCP`.
+    (Optional) `port` - The port the load balancer uses when performing health checks on targets. The default is `80`. Valid values are either ports 1-65535.
+    (Optional) `port_override` - Whether to override the port on which each target receives trafficfrom the load balancer to a different port. Defaults to `true`.
+    (Optional) `path` - Use the default path of `/` to ping the root, or specify a custom path if preferred. Only valid if the `protocol` is `HTTP` or `HTTPS`.
     (Optional) `healthy_threshold` - The number of consecutive health checks successes required before considering an unhealthy target healthy. Valid value range is 2 - 10. Defaults to `3`.
     (Optional) `unhealthy_threshold` - The number of consecutive health check failures required before considering a target unhealthy. Valid value range is 2 - 10. Defaults to `3`.
     (Optional) `interval` - Approximate amount of time, in seconds, between health checks of an individual target. Valid value range is 5 - 300. Defaults to `10`.
     (Optional) `timeout` - The amount of time, in seconds, during which no response means a failed health check. Valid value range is 2 - 120. Defaults to `5`.
-    (Optional) `path` - Use the default path of `/` to ping the root, or specify a custom path if preferred. Only valid if the `protocol` is `HTTP` or `HTTPS`.
   EOF
-  type        = any
-  default     = {}
-  nullable    = false
+  type = object({
+    protocol      = optional(string, "TCP")
+    port          = optional(number, 80)
+    port_override = optional(bool, true)
+    path          = optional(string, "/")
+
+    healthy_threshold   = optional(number, 3)
+    unhealthy_threshold = optional(number, 3)
+    interval            = optional(number, 10)
+    timeout             = optional(number, 5)
+  })
+  default  = {}
+  nullable = false
 
   validation {
     condition = alltrue([
-      try(var.health_check.port, 6081) >= 1,
-      try(var.health_check.port, 6081) <= 65535,
-      contains(["TCP", "HTTP", "HTTPS"], try(var.health_check.protocol, "TCP")),
-      try(var.health_check.healthy_threshold, 3) <= 10,
-      try(var.health_check.healthy_threshold, 3) >= 2,
-      try(var.health_check.unhealthy_threshold, 3) <= 10,
-      try(var.health_check.unhealthy_threshold, 3) >= 2,
-      try(var.health_check.interval, 10) >= 5,
-      try(var.health_check.interval, 10) <= 300,
-      try(var.health_check.timeout, 5) >= 2,
-      try(var.health_check.timeout, 5) <= 120,
-      length(try(var.health_check.path, "/")) <= 1024,
+      contains(["TCP", "HTTP", "HTTPS"], var.health_check.protocol),
+      var.health_check.port >= 1,
+      var.health_check.port <= 65535,
+      length(var.health_check.path) <= 1024,
+      var.health_check.healthy_threshold <= 10,
+      var.health_check.healthy_threshold >= 2,
+      var.health_check.unhealthy_threshold <= 10,
+      var.health_check.unhealthy_threshold >= 2,
+      var.health_check.interval >= 5,
+      var.health_check.interval <= 300,
+      var.health_check.timeout >= 2,
+      var.health_check.timeout <= 120,
     ])
     error_message = "Not valid parameters for `health_check`."
   }

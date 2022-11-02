@@ -67,20 +67,24 @@ resource "aws_lb_target_group" "this" {
   health_check {
     enabled = true
 
-    port     = try(var.health_check.port, var.port)
-    protocol = try(var.health_check.protocol, "HTTP")
-
-    healthy_threshold   = try(var.health_check.healthy_threshold, 5)
-    unhealthy_threshold = try(var.health_check.unhealthy_threshold, 2)
-    interval            = try(var.health_check.interval, 30)
-    timeout             = try(var.health_check.timeout, 5)
-
-    matcher = (var.protocol_version != "GRPC"
-      ? try(var.health_check.success_codes, "200")
-    : try(var.health_check.success_codes, "12"))
+    protocol = var.health_check.protocol
+    port = (var.health_check.port_override
+      ? coalesce(var.health_check.port, var.port)
+      : "traffic-port"
+    )
     path = (var.protocol_version != "GRPC"
-      ? try(var.health_check.path, "/")
-    : try(var.health_check.path, "/AWS.ALB/healthcheck"))
+      ? coalesce(var.health_check.path, "/")
+      : coalesce(var.health_check.path, "/AWS.ALB/healthcheck")
+    )
+    matcher = (var.protocol_version != "GRPC"
+      ? coalesce(var.health_check.success_codes, "200")
+      : coalesce(var.health_check.success_codes, "12")
+    )
+
+    healthy_threshold   = var.health_check.healthy_threshold
+    unhealthy_threshold = var.health_check.unhealthy_threshold
+    interval            = var.health_check.interval
+    timeout             = var.health_check.timeout
   }
 
   tags = merge(

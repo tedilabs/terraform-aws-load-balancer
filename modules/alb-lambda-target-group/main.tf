@@ -36,16 +36,19 @@ resource "aws_lb_target_group" "this" {
   ## Attributes
   lambda_multi_value_headers_enabled = var.multi_value_headers_enabled
 
+  ## INFO: Not supported attributes
+  # - `port`
+  # - `protocol`
   health_check {
     enabled = try(var.health_check.enabled, false)
 
-    healthy_threshold   = try(var.health_check.healthy_threshold, 5)
-    unhealthy_threshold = try(var.health_check.unhealthy_threshold, 2)
-    interval            = try(var.health_check.interval, 35)
-    timeout             = try(var.health_check.timeout, 30)
+    path    = var.health_check.path
+    matcher = var.health_check.success_codes
 
-    matcher = try(var.health_check.success_codes, "200")
-    path    = try(var.health_check.path, "/")
+    healthy_threshold   = var.health_check.healthy_threshold
+    unhealthy_threshold = var.health_check.unhealthy_threshold
+    interval            = var.health_check.interval
+    timeout             = var.health_check.timeout
   }
 
   tags = merge(
@@ -70,7 +73,7 @@ resource "aws_lb_target_group_attachment" "this" {
   target_group_arn = aws_lb_target_group.this.arn
 
   # TODO: divide function name and alias
-  target_id         = var.targets[0].lambda_function
+  target_id         = tolist(var.targets)[0].lambda_function
   availability_zone = "all"
 
   depends_on = [
@@ -86,7 +89,7 @@ resource "aws_lb_target_group_attachment" "this" {
 resource "aws_lambda_permission" "this" {
   count = length(var.targets) > 0 ? 1 : 0
 
-  function_name = var.targets[0].lambda_function
+  function_name = tolist(var.targets)[0].lambda_function
 
   statement_id_prefix = "AllowExecutionFromALB-"
   principal           = "elasticloadbalancing.amazonaws.com"
