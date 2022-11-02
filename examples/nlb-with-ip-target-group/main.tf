@@ -90,13 +90,15 @@ module "target_group" {
   ]
 
   health_check = {
-    port                = 80
-    protocol            = "HTTP"
+    protocol      = "HTTP"
+    port          = 443
+    port_override = false
+    path          = "/health"
+
     interval            = 10
     timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3
-    path                = "/health"
   }
 
   tags = {

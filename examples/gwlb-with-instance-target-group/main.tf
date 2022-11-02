@@ -67,12 +67,14 @@ module "target_group" {
   ]
 
   health_check = {
-    port                = 80
-    protocol            = "HTTP"
+    protocol      = "HTTP"
+    port          = 80
+    port_override = true
+    path          = "/health"
+
     interval            = 10
     timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3
-    path                = "/health"
   }
 }
