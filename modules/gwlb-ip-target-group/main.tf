@@ -21,7 +21,7 @@ data "aws_vpc" "this" {
 locals {
   ipv4_regex = "^(\\d+).(\\d+).(\\d+).(\\d+)$"
 
-  ipv4_vpc_cidrs = data.aws_vpc.this.cidr_block_associations.*.cidr_block
+  ipv4_vpc_cidrs = data.aws_vpc.this.cidr_block_associations[*].cidr_block
   ipv6_vpc_cidrs = [data.aws_vpc.this.ipv6_cidr_block]
 
   port = 6081
