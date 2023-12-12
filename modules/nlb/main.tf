@@ -22,7 +22,11 @@ data "aws_availability_zones" "available" {
 data "aws_subnet" "this" {
   for_each = var.network_mapping
 
-  id = each.value.subnet_id
+  id = each.value.subnet
+}
+
+resource "terraform_data" "replace_trigger" {
+  input = length(local.security_groups) > 0
 }
 
 locals {
@@ -31,30 +35,50 @@ locals {
   available_availability_zone_ids = data.aws_availability_zones.available.zone_ids
   network_mapping = {
     for zone_id in local.available_availability_zone_ids :
-    zone_id => try(merge({
-      cidr_block           = data.aws_subnet.this[zone_id].cidr_block != "" ? data.aws_subnet.this[zone_id].cidr_block : null
-      ipv6_cidr_block      = data.aws_subnet.this[zone_id].ipv6_cidr_block != "" ? data.aws_subnet.this[zone_id].ipv6_cidr_block : null
-      private_ipv4_address = null
-      ipv6_address         = null
-      allocation_id        = null
-    }, var.network_mapping[zone_id]), null)
+    zone_id => (contains(keys(var.network_mapping), zone_id)
+      ? {
+        subnet = data.aws_subnet.this[zone_id].id
+
+        ipv4_cidr            = data.aws_subnet.this[zone_id].cidr_block != "" ? data.aws_subnet.this[zone_id].cidr_block : null
+        ipv6_cidr            = data.aws_subnet.this[zone_id].ipv6_cidr_block != "" ? data.aws_subnet.this[zone_id].ipv6_cidr_block : null
+        private_ipv4_address = var.network_mapping[zone_id].private_ipv4_address
+        ipv6_address         = var.network_mapping[zone_id].ipv6_address
+        elastic_ip           = var.network_mapping[zone_id].elastic_ip
+      }
+      : null
+    )
   }
   enabled_network_mapping = {
     for zone_id, config in local.network_mapping :
     zone_id => config
-    if try(config.subnet_id, null) != null
+    if config != null
   }
   availability_zone_ids = keys(local.enabled_network_mapping)
+
+  route53_resolver_availability_zone_affinity = {
+    "ANY"     = "any_availability_zone"
+    "PARTIAL" = "partial_availability_zone_affinity"
+    "ALL"     = "availability_zone_affinity"
+  }
 }
+
+
+###################################################
+# Network Load Balancer
+###################################################
 
 # INFO: Not supported attributes
 # - `customer_owned_ipv4_pool`
 # - `desync_mitigation_mode`
 # - `drop_invalid_header_fields`
 # - `enable_http2`
+# - `enable_tls_version_and_cipher_suite_headers`
 # - `enable_waf_fail_open`
+# - `enable_xff_client_port`
 # - `idle_timeout`
-# - `security_groups`
+# - `preserve_host_header`
+# - `subnets`
+# - `xff_header_processing_mode`
 resource "aws_lb" "this" {
   name = var.name
 
@@ -66,27 +90,47 @@ resource "aws_lb" "this" {
     for_each = local.enabled_network_mapping
 
     content {
-      subnet_id = subnet_mapping.value.subnet_id
+      subnet_id = subnet_mapping.value.subnet
 
-      private_ipv4_address = try(subnet_mapping.value.private_ipv4_address, null)
-      ipv6_address         = try(subnet_mapping.value.ipv6_address, null)
-      allocation_id        = try(subnet_mapping.value.allocation_id, null)
+      private_ipv4_address = subnet_mapping.value.private_ipv4_address
+      ipv6_address         = subnet_mapping.value.ipv6_address
+      allocation_id        = subnet_mapping.value.elastic_ip
     }
   }
 
+
+  ## Access Control
+  enforce_security_group_inbound_rules_on_private_link_traffic = (length(local.security_groups) > 0
+    ? (var.security_group_evaluation_on_privatelink_enabled ? "on" : "off")
+    : null
+  )
+  security_groups = local.security_groups
+
+
+  ## Logging
   dynamic "access_logs" {
-    for_each = var.access_log_enabled ? ["go"] : []
+    for_each = var.access_log.enabled ? [var.access_log] : []
+    iterator = log
 
     content {
-      enabled = var.access_log_enabled
-      bucket  = var.access_log_s3_bucket
-      prefix  = var.access_log_s3_key_prefix
+      enabled = log.value.enabled
+      bucket  = log.value.s3_bucket.name
+      prefix  = log.value.s3_bucket.key_prefix
     }
   }
 
+
   ## Attributes
+  dns_record_client_routing_policy = local.route53_resolver_availability_zone_affinity[var.route53_resolver_availability_zone_affinity]
   enable_cross_zone_load_balancing = var.cross_zone_load_balancing_enabled
   enable_deletion_protection       = var.deletion_protection_enabled
+
+
+  timeouts {
+    create = var.timeouts.create
+    update = var.timeouts.update
+    delete = var.timeouts.delete
+  }
 
   tags = merge(
     {
@@ -95,6 +139,12 @@ resource "aws_lb" "this" {
     local.module_tags,
     var.tags,
   )
+
+  lifecycle {
+    replace_triggered_by = [
+      terraform_data.replace_trigger,
+    ]
+  }
 }
 
 
@@ -117,10 +167,12 @@ module "listener" {
   target_group = each.value.target_group
 
   ## TLS
-  tls_certificate             = try(each.value.tls_certificate, null)
-  tls_additional_certificates = try(each.value.tls_additional_certificates, [])
-  tls_security_policy         = try(each.value.tls_security_policy, "ELBSecurityPolicy-TLS13-1-2-2021-06")
-  tls_alpn_policy             = try(each.value.tls_alpn_policy, "None")
+  tls = {
+    certificate             = each.value.tls.certificate
+    additional_certificates = each.value.tls.additional_certificates
+    security_policy         = each.value.tls.security_policy
+    alpn_policy             = each.value.tls.alpn_policy
+  }
 
   resource_group_enabled = false
   module_tags_enabled    = false

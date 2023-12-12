@@ -28,11 +28,6 @@ output "availability_zone_ids" {
   value       = local.availability_zone_ids
 }
 
-output "available_availability_zone_ids" {
-  description = "A list of the Availability Zone IDs available to the current account and region."
-  value       = local.available_availability_zone_ids
-}
-
 output "vpc_id" {
   description = "The VPC ID of the load balancer."
   value       = aws_lb.this.vpc_id

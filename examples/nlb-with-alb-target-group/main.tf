@@ -31,7 +31,7 @@ module "nlb" {
   network_mapping = {
     for az, subnet in data.aws_subnet.default :
     az => {
-      subnet_id = subnet.id
+      subnet = subnet.id
     }
   }
 
@@ -45,9 +45,14 @@ module "nlb" {
     target_group = module.target_group.arn
   }]
 
-  access_log_enabled       = false
-  access_log_s3_bucket     = "my-bucket"
-  access_log_s3_key_prefix = "/tedilabs-nlb-alb/"
+  ## Access Log
+  access_log = {
+    enabled = false
+    s3_bucket = {
+      name       = "my-bucket"
+      key_prefix = "/tedilabs-nlb-alb/"
+    }
+  }
 
   tags = {
     "project" = "terraform-aws-load-balancer-examples"
