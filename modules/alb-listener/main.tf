@@ -14,12 +14,18 @@ locals {
   } : {}
 }
 
-
 locals {
   load_balancer_name = split("/", var.load_balancer)[2]
   tls_enabled        = var.protocol == "HTTPS"
 }
 
+
+###################################################
+# ALB Listener
+###################################################
+
+# INFO: Not supported attributes
+# - `alpn_policy`
 resource "aws_lb_listener" "this" {
   load_balancer_arn = var.load_balancer
 
@@ -27,8 +33,8 @@ resource "aws_lb_listener" "this" {
   protocol = var.protocol
 
   ## TLS
-  certificate_arn = local.tls_enabled ? var.tls_certificate : null
-  ssl_policy      = local.tls_enabled ? var.tls_security_policy : null
+  certificate_arn = local.tls_enabled ? var.tls.certificate : null
+  ssl_policy      = local.tls_enabled ? var.tls.security_policy : null
 
   dynamic "default_action" {
     for_each = (var.default_action_type == "FORWARD"
@@ -325,7 +331,7 @@ resource "aws_lb_listener_rule" "this" {
 ###################################################
 
 resource "aws_lb_listener_certificate" "this" {
-  for_each = toset(local.tls_enabled ? var.tls_additional_certificates : [])
+  for_each = toset(local.tls_enabled ? var.tls.additional_certificates : [])
 
   listener_arn    = aws_lb_listener.this.arn
   certificate_arn = each.key

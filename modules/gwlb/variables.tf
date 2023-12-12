@@ -12,11 +12,13 @@ variable "name" {
 variable "network_mapping" {
   description = <<EOF
   (Optional) The configuration for the load balancer how routes traffic to targets in which subnets, and in accordance with IP address settings. Select at least one Availability Zone and one subnet for each zone. We recommend selecting at least two Availability Zones. The load balancer will route traffic only to targets in the selected Availability Zones. Zones that are not supported by the load balancer or VPC cannot be selected. Subnets can be added, but not removed, once a load balancer is created. Each key of `network_mapping` is the availability zone id like `apne2-az1`, `use1-az1`. Each value of `network_mapping` block as defined below.
-    (Required) `subnet_id` - The id of the subnet of which to attach to the load balancer. You can specify only one subnet per Availability Zone.
+    (Required) `subnet` - The id of the subnet of which to attach to the load balancer. You can specify only one subnet per Availability Zone.
   EOF
-  type        = map(map(string))
-  default     = {}
-  nullable    = false
+  type = map(object({
+    subnet = string
+  }))
+  default  = {}
+  nullable = false
 }
 
 variable "cross_zone_load_balancing_enabled" {
@@ -50,6 +52,17 @@ variable "listeners" {
     condition     = length(var.listeners) <= 1
     error_message = "The Gateway Load Balancer is limited to a single listener."
   }
+}
+
+variable "timeouts" {
+  description = "(Optional) How long to wait for the load balancer to be created/updated/deleted."
+  type = object({
+    create = optional(string, "10m")
+    update = optional(string, "10m")
+    delete = optional(string, "10m")
+  })
+  default  = {}
+  nullable = false
 }
 
 variable "tags" {

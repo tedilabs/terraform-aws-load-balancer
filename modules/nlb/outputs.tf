@@ -48,11 +48,6 @@ output "availability_zone_ids" {
   value       = local.availability_zone_ids
 }
 
-output "available_availability_zone_ids" {
-  description = "A list of the Availability Zone IDs available to the current account and region."
-  value       = local.available_availability_zone_ids
-}
-
 output "vpc_id" {
   description = "The VPC ID of the load balancer."
   value       = aws_lb.this.vpc_id
@@ -68,20 +63,32 @@ output "network_mapping" {
   value       = local.network_mapping
 }
 
+output "security_group_evaluation_on_privatelink_enabled" {
+  description = "Whether to evaluate inbound security group rules for traffic sent to a Network Load Balancer through AWS PrivateLink."
+  value       = aws_lb.this.enforce_security_group_inbound_rules_on_private_link_traffic == "on"
+}
+
+output "default_security_group" {
+  description = "The default security group ID of the load balancer."
+  value       = one(module.security_group[*].id)
+}
+
+output "security_groups" {
+  description = "A set of security group IDs which is assigned to the load balancer."
+  value       = aws_lb.this.security_groups
+}
+
 output "access_log" {
   description = "The configuration for access logs of the load balancer."
-  value = {
-    enabled       = var.access_log_enabled
-    s3_bucket     = var.access_log_s3_bucket
-    s3_key_prefix = var.access_log_s3_key_prefix
-  }
+  value       = var.access_log
 }
 
 output "attributes" {
   description = "Load Balancer Attributes that applied to the network load balancer."
   value = {
-    cross_zone_load_balancing_enabled = aws_lb.this.enable_cross_zone_load_balancing
-    deletion_protection_enabled       = aws_lb.this.enable_deletion_protection
+    cross_zone_load_balancing_enabled           = aws_lb.this.enable_cross_zone_load_balancing
+    deletion_protection_enabled                 = aws_lb.this.enable_deletion_protection
+    route53_resolver_availability_zone_affinity = var.route53_resolver_availability_zone_affinity
   }
 }
 

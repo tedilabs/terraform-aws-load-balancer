@@ -15,15 +15,16 @@ module "alb" {
   network_mapping = {
     for az, subnet in data.aws_subnet.default :
     az => {
-      subnet_id = subnet.id
+      subnet = subnet.id
     }
   }
 
   default_security_group = {
+    enabled     = true
     name        = "tedilabs-nlb-alb-alb"
     description = "Managed by Terraform."
 
-    ingress_cidrs = ["10.0.0.0/8", "172.31.0.0/16"]
+    listener_ingress_ipv4_cidrs = ["10.0.0.0/8", "172.31.0.0/16"]
   }
   security_groups = []
 
@@ -79,9 +80,13 @@ module "alb" {
   ]
 
   ## Access Log
-  access_log_enabled       = false
-  access_log_s3_bucket     = "my-bucket"
-  access_log_s3_key_prefix = "/tedilabs-nlb-alb-alb/"
+  access_log = {
+    enabled = false
+    s3_bucket = {
+      name       = "my-bucket"
+      key_prefix = "/tedilabs-nlb-alb-alb/"
+    }
+  }
 
   tags = {
     "project" = "terraform-aws-load-balancer-examples"

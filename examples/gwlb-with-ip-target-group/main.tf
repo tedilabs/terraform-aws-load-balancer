@@ -28,7 +28,7 @@ module "gwlb" {
   network_mapping = {
     for az, subnet in data.aws_subnet.default :
     az => {
-      subnet_id = subnet.id
+      subnet = subnet.id
     }
   }
 

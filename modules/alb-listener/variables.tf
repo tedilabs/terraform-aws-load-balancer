@@ -1,6 +1,7 @@
 variable "load_balancer" {
   description = "(Required) The ARN of the application load balancer to add the listener."
   type        = string
+  nullable    = false
 }
 
 variable "port" {
@@ -130,25 +131,21 @@ variable "rules" {
   }
 }
 
-variable "tls_certificate" {
-  description = "(Optional) The ARN of the default SSL server certificate. For adding additional SSL certificates, see the `tls_additional_certificates` variable. Required if `protocol` is `HTTPS`."
-  type        = string
-  default     = null
-}
-
-variable "tls_additional_certificates" {
-  description = "(Optional) A set of ARNs of the certificate to attach to the listener. This is for additional certificates and does not replace the default certificate on the listener."
-  type        = set(string)
-  default     = []
-  nullable    = false
-}
-
 # INFO: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
-variable "tls_security_policy" {
-  description = "(Optional) The name of security policy for a Secure Socket Layer (SSL) negotiation configuration. This is used to negotiate SSL connections with clients. Required if protocol is `HTTPS`. Defaults to `ELBSecurityPolicy-2016-08` security policy. The `ELBSecurityPolicy-2016-08` security policy is always used for backend connections. Application Load Balancers do not support custom security policies."
-  type        = string
-  default     = "ELBSecurityPolicy-2016-08"
-  nullable    = false
+variable "tls" {
+  description = <<EOF
+  (Optional) The configuration for TLS listener of the load balancer. Required if `protocol` is `HTTPS`. `tls` block as defined below.
+    (Optional) `certificate` - The ARN of the default SSL server certificate. For adding additional SSL certificates, see the `additional_certificates` variable.
+    (Optional) `additional_certificates` - A set of ARNs of the certificate to attach to the listener. This is for additional certificates and does not replace the default certificate on the listener.
+    (Optional) `security_policy` - The name of security policy for a Secure Socket Layer (SSL) negotiation configuration. This is used to negotiate SSL connections with clients. Required if protocol is `HTTPS`. Defaults to `ELBSecurityPolicy-2016-08` security policy. The `ELBSecurityPolicy-2016-08` security policy is always used for backend connections. Application Load Balancers do not support custom security policies.
+  EOF
+  type = object({
+    certificate             = optional(string)
+    additional_certificates = optional(set(string), [])
+    security_policy         = optional(string, "ELBSecurityPolicy-2016-08")
+  })
+  default  = {}
+  nullable = false
 }
 
 variable "tags" {

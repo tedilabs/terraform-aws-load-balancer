@@ -10,7 +10,7 @@ locals {
 
 
 ###################################################
-# Security Group for Application Load Balancer
+# Security Group for Network Load Balancer
 ###################################################
 
 module "security_group" {
