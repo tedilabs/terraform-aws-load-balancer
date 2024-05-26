@@ -1,27 +1,65 @@
 # Modules
 ":floppy_disk: alb":
-- modules/alb/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/alb/**/*
+
 ":floppy_disk: nlb":
-- modules/nlb/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/nlb/**/*
+
 ":floppy_disk: gwlb":
-- modules/gwlb/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/gwlb/**/*
+
 ":floppy_disk: alb-listener":
-- modules/alb-listener/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/alb-listener/**/*
+
 ":floppy_disk: nlb-listener":
-- modules/nlb-listener/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/nlb-listener/**/*
+
 ":floppy_disk: alb-instance-target-group":
-- modules/alb-instance-target-group/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/alb-instance-target-group/**/*
+
 ":floppy_disk: alb-ip-target-group":
-- modules/alb-ip-target-group/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/alb-ip-target-group/**/*
+
 ":floppy_disk: alb-lambda-target-group":
-- modules/alb-lambda-target-group/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/alb-lambda-target-group/**/*
+
 ":floppy_disk: nlb-instance-target-group":
-- modules/nlb-instance-target-group/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/nlb-instance-target-group/**/*
+
 ":floppy_disk: nlb-ip-target-group":
-- modules/nlb-ip-target-group/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/nlb-ip-target-group/**/*
+
 ":floppy_disk: nlb-alb-target-group":
-- modules/nlb-alb-target-group/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/nlb-alb-target-group/**/*
+
 ":floppy_disk: gwlb-instance-target-group":
-- modules/gwlb-instance-target-group/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/gwlb-instance-target-group/**/*
+
 ":floppy_disk: gwlb-ip-target-group":
-- modules/gwlb-ip-target-group/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/gwlb-ip-target-group/**/*
