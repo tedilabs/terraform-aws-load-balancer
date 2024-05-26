@@ -15,7 +15,7 @@ locals {
 
 module "security_group" {
   source  = "tedilabs/network/aws//modules/security-group"
-  version = "~> 0.31.0"
+  version = "~> 0.32.0"
 
   count = var.default_security_group.enabled ? 1 : 0
 
@@ -29,7 +29,7 @@ module "security_group" {
       for listener in var.listeners : {
         id          = "listener-${listener.port}"
         description = "Default rule for the load balancer listener."
-        protocol    = listener.protocol
+        protocol    = "tcp"
         from_port   = listener.port
         to_port     = listener.port
 
