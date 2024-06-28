@@ -7,27 +7,6 @@ updates:
 
 - package-ecosystem: terraform
   directories:
-  - /modules/alb
-  - /modules/alb-instance-target-group
-  - /modules/alb-ip-target-group
-  - /modules/alb-lambda-target-group
-  - /modules/alb-listener
-  - /modules/gwlb
-  - /modules/gwlb-instance-target-group
-  - /modules/gwlb-ip-target-group
-  - /modules/nlb
-  - /modules/nlb-alb-target-group
-  - /modules/nlb-instance-target-group
-  - /modules/nlb-ip-target-group
-  - /modules/nlb-listener
-  - /modules/iam-group
-  - /modules/iam-oidc-identity-provider
-  - /modules/iam-policy
-  - /modules/iam-predefined-policies
-  - /modules/iam-role
-  - /modules/iam-saml-identity-provider
-  - /modules/iam-service-linked-role
-  - /modules/iam-user
-  - /modules/region
+  - /modules/*
   schedule:
     interval: weekly
