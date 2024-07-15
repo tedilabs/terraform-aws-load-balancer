@@ -19,6 +19,7 @@ locals {
 # - `ip_address_type`
 # - `lambda_multi_value_headers_enabled`
 # - `load_balancing_algorithm_type`
+# - `load_balancing_anomaly_mitigation`
 # - `protocol_version`
 # - `slow_start`
 resource "aws_lb_target_group" "this" {

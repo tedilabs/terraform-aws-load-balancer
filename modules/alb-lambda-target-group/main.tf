@@ -20,6 +20,7 @@ locals {
 # - `deregistration_delay`
 # - `ip_address_type`
 # - `load_balancing_algorithm_type`
+# - `load_balancing_anomaly_mitigation`
 # - `preserve_client_ip`
 # - `protocol`
 # - `protocol_version`

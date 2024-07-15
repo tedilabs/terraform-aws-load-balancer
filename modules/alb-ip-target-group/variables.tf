@@ -90,19 +90,26 @@ variable "deregistration_delay" {
 }
 
 variable "load_balancing_algorithm" {
-  description = "(Optional) Determines how the load balancer selects targets when routing requests. Valid values are `ROUND_ROBIN` or `LEAST_OUTSTANDING_REQUESTS`. Defaults to `ROUND_ROBIN`."
+  description = "(Optional) Determines how the load balancer selects targets when routing requests. Valid values are `ROUND_ROBIN`, `LEAST_OUTSTANDING_REQUESTS` or `WEIGHTED_RANDOM`. Defaults to `ROUND_ROBIN`."
   type        = string
   default     = "ROUND_ROBIN"
   nullable    = false
 
   validation {
-    condition     = contains(["ROUND_ROBIN", "LEAST_OUTSTANDING_REQUESTS"], var.load_balancing_algorithm)
-    error_message = "Valid values are `ROUND_ROBIN` and `LEAST_OUTSTANDING_REQUESTS`."
+    condition     = contains(["ROUND_ROBIN", "LEAST_OUTSTANDING_REQUESTS", "WEIGHTED_RANDOM"], var.load_balancing_algorithm)
+    error_message = "Valid values are `ROUND_ROBIN`, `LEAST_OUTSTANDING_REQUESTS` and `WEIGHTED_RANDOM`."
   }
 }
 
+variable "anomaly_mitigation_enabled" {
+  description = "(Optional) Whether to enable target anomaly mitigation. When a target is determined to be anomalous, traffic is automatically routed away so the target has an opportunity to recover. Target anomaly mitigation is only supported by the `WEIGHTED_RANDOM` load balancing algorithm type. Not compatible with the `slow_start_duration` attribute. Defaults to `false`."
+  type        = bool
+  default     = false
+  nullable    = false
+}
+
 variable "slow_start_duration" {
-  description = "(Optional) The amount time for a newly registered targets to warm up before the load balancer sends them a full share of requests. During this period, targets receives an increasing share of requests until it reaches its fair share. Requires `30` to `900` seconds to enable, or `0` seconds to disable. This attribute cannot be combined with the Least outstanding requests algorithm."
+  description = "(Optional) The amount time for a newly registered targets to warm up before the load balancer sends them a full share of requests. During this period, targets receives an increasing share of requests until it reaches its fair share. Requires `30` to `900` seconds to enable, or `0` seconds to disable. Not compatible with the Least outstanding requests and Weighted random routing algorithms."
   type        = number
   default     = 0
   nullable    = false
@@ -112,7 +119,7 @@ variable "slow_start_duration" {
       var.slow_start_duration == 0,
       var.slow_start_duration <= 900 && var.slow_start_duration >= 30
     ])
-    error_message = "Requires `30` to `900` seconds to enable, or `0` seconds to disable. This attribute cannot be combined with the Least outstanding requests algorithm."
+    error_message = "Requires `30` to `900` seconds to enable, or `0` seconds to disable. Not compatible with the Least outstanding requests and Weighted random routing algorithms."
   }
 }
 
