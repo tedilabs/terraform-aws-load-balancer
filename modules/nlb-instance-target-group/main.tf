@@ -14,6 +14,18 @@ locals {
   } : {}
 }
 
+locals {
+  cross_zone_strategy = {
+    "ENABLED"  = "true"
+    "DISABLED" = "false"
+    "INHERIT"  = "use_load_balancer_configuration"
+  }
+}
+
+
+###################################################
+# NLB Instance Target Group
+###################################################
 
 # INFO: Not supported attributes
 # - `ip_address_type`
@@ -32,10 +44,11 @@ resource "aws_lb_target_group" "this" {
   protocol    = var.protocol
 
   ## Attributes
-  connection_termination = var.terminate_connection_on_deregistration
-  deregistration_delay   = var.deregistration_delay
-  preserve_client_ip     = var.preserve_client_ip
-  proxy_protocol_v2      = var.proxy_protocol_v2
+  connection_termination            = var.terminate_connection_on_deregistration
+  deregistration_delay              = var.deregistration_delay
+  load_balancing_cross_zone_enabled = local.cross_zone_strategy[var.load_balancing.cross_zone_strategy]
+  preserve_client_ip                = var.preserve_client_ip
+  proxy_protocol_v2                 = var.proxy_protocol_v2
 
   ## INFO: Not supported attributes
   # - `cookie_duration`

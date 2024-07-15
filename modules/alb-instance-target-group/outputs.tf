@@ -61,13 +61,16 @@ output "targets" {
 output "attributes" {
   description = "Attributes of the Instance target group of network load balancer."
   value = {
-    anomaly_mitigation_enabled = (var.load_balancing_algorithm == "WEIGHTED_RANDOM"
-      ? var.anomaly_mitigation_enabled
-      : null
-    )
-    deregistration_delay     = aws_lb_target_group.this.deregistration_delay
-    load_balancing_algorithm = upper(aws_lb_target_group.this.load_balancing_algorithm_type)
-    slow_start_duration      = aws_lb_target_group.this.slow_start
+    deregistration_delay = aws_lb_target_group.this.deregistration_delay
+    load_balancing = {
+      algorithm = upper(aws_lb_target_group.this.load_balancing_algorithm_type)
+      anomaly_mitigation_enabled = (var.load_balancing.algorithm == "WEIGHTED_RANDOM"
+        ? var.load_balancing.anomaly_mitigation_enabled
+        : null
+      )
+      cross_zone_strategy = var.load_balancing.cross_zone_strategy
+    }
+    slow_start_duration = aws_lb_target_group.this.slow_start
     stickiness = {
       enabled  = aws_lb_target_group.this.stickiness[0].enabled
       type     = upper(aws_lb_target_group.this.stickiness[0].type)

@@ -15,12 +15,17 @@ locals {
 }
 
 
+###################################################
+# ALB Lambda Target Group
+###################################################
+
 # INFO: Not supported attributes
 # - `connection_termination`
 # - `deregistration_delay`
 # - `ip_address_type`
 # - `load_balancing_algorithm_type`
 # - `load_balancing_anomaly_mitigation`
+# - `load_balancing_cross_zone_enabled`
 # - `preserve_client_ip`
 # - `protocol`
 # - `protocol_version`

@@ -24,12 +24,18 @@ locals {
   ]
 }
 
+
+###################################################
+# GWLB Instance Target Group
+###################################################
+
 # INFO: Not supported attributes
 # - `connection_termination`
 # - `ip_address_type`
 # - `lambda_multi_value_headers_enabled`
 # - `load_balancing_algorithm_type`
 # - `load_balancing_anomaly_mitigation`
+# - `load_balancing_cross_zone_enabled`
 # - `preserve_client_ip`
 # - `protocol_version`
 # - `proxy_protocol_v2`
