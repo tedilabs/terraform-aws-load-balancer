@@ -20,6 +20,7 @@ locals {
 # - `ip_address_type`
 # - `lambda_multi_value_headers_enabled`
 # - `load_balancing_algorithm_type`
+# - `load_balancing_anomaly_mitigation`
 # - `protocol_version`
 # - `proxy_protocol_v2`
 # - `slow_start`

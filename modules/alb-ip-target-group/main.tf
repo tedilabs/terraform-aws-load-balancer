@@ -55,7 +55,11 @@ resource "aws_lb_target_group" "this" {
   ## Attributes
   deregistration_delay          = var.deregistration_delay
   load_balancing_algorithm_type = lower(var.load_balancing_algorithm)
-  slow_start                    = var.slow_start_duration
+  load_balancing_anomaly_mitigation = (var.load_balancing_algorithm == "WEIGHTED_RANDOM"
+    ? var.anomaly_mitigation_enabled ? "on" : "off"
+    : null
+  )
+  slow_start = var.slow_start_duration
 
   stickiness {
     enabled         = var.stickiness_enabled

@@ -11,14 +11,14 @@ This module creates following resources.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.71 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.38 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.19.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.58.0 |
 
 ## Modules
 
@@ -57,6 +57,7 @@ This module creates following resources.
 | <a name="output_attributes"></a> [attributes](#output\_attributes) | Attributes of the Lambda target group of application load balancer. |
 | <a name="output_health_check"></a> [health\_check](#output\_health\_check) | Health Check configuration of the target group. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the target group. |
+| <a name="output_load_balancers"></a> [load\_balancers](#output\_load\_balancers) | The ARNs (Amazon Resource Name) of the load balancers associated with the target group. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |
 | <a name="output_targets"></a> [targets](#output\_targets) | A list of targets in the target group. The Lambda target group is limited to a single Lambda function target. |
 | <a name="output_type"></a> [type](#output\_type) | The target type of the target group. |
