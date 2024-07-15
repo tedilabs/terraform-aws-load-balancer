@@ -1,3 +1,8 @@
+output "load_balancers" {
+  description = "The ARNs (Amazon Resource Name) of the load balancers associated with the target group."
+  value       = aws_lb_target_group.this.load_balancer_arns
+}
+
 output "arn" {
   description = "The Amazon Resource Name (ARN) of the target group."
   value       = aws_lb_target_group.this.arn
