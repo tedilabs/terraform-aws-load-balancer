@@ -64,8 +64,11 @@ output "attributes" {
   value = {
     terminate_connection_on_deregistration = aws_lb_target_group.this.connection_termination
     deregistration_delay                   = aws_lb_target_group.this.deregistration_delay
-    preserve_client_ip                     = aws_lb_target_group.this.preserve_client_ip
-    proxy_protocol_v2                      = aws_lb_target_group.this.proxy_protocol_v2
+    load_balancing = {
+      cross_zone_strategy = var.load_balancing.cross_zone_strategy
+    }
+    preserve_client_ip = aws_lb_target_group.this.preserve_client_ip
+    proxy_protocol_v2  = aws_lb_target_group.this.proxy_protocol_v2
     stickiness = {
       enabled = aws_lb_target_group.this.stickiness[0].enabled
       type    = upper(aws_lb_target_group.this.stickiness[0].type)

@@ -84,6 +84,23 @@ variable "deregistration_delay" {
   }
 }
 
+variable "load_balancing" {
+  description = <<EOF
+  (Optional) A load balancing configuration of the target group. `load_balancing` block as defined below.
+    (Optional) `cross_zone_strategy` - Determines how the load balancer routes requests across the Availability Zones. Valid values are `ENABLED`, `DISABLED` or `INHERIT`. Defaults to `INHERIT` (Use load balancer configuration).
+  EOF
+  type = object({
+    cross_zone_strategy = optional(string, "INHERIT")
+  })
+  default  = {}
+  nullable = false
+
+  validation {
+    condition     = contains(["ENABLED", "DISABLED", "INHERIT"], var.load_balancing.cross_zone_strategy)
+    error_message = "Valid values are `ENABLED`, `DISABLED` and `INHERIT`."
+  }
+}
+
 variable "preserve_client_ip" {
   description = "(Optional) Whether to preserve client IP addresses and ports in the packets forwarded to targets. Client IP preservation cannot be disabled if the target group protocol is `UDP` and `TCP_UDP`. Defaults to `true`."
   type        = bool
