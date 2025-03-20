@@ -6,7 +6,7 @@ This module creates following resources.
 - `aws_lb_listener_certificate` (optional)
 - `aws_lb_listener_rule` (optional)
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -63,4 +63,4 @@ This module creates following resources.
 | <a name="output_protocol"></a> [protocol](#output\_protocol) | The protocol for connections of the listener. |
 | <a name="output_rules"></a> [rules](#output\_rules) | The rules of the listener determine how the load balancer routes requests to the targets in one or more target groups. |
 | <a name="output_tls"></a> [tls](#output\_tls) | TLS configurations of the listener. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->

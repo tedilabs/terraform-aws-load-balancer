@@ -6,7 +6,7 @@ This module creates following resources.
 - `aws_lb_listener` (optional)
 - `aws_lb_listener_certificate` (optional)
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -84,4 +84,4 @@ This module creates following resources.
 | <a name="output_type"></a> [type](#output\_type) | The type of the load balancer. Always return `NETWORK`. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The VPC ID of the load balancer. |
 | <a name="output_zone_id"></a> [zone\_id](#output\_zone\_id) | The canonical hosted zone ID of the load balancer to be used in a Route 53 Alias record. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->

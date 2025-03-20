@@ -5,7 +5,7 @@ This module creates following resources.
 - `aws_lb_target_group`
 - `aws_lb_target_group_attachment` (optional)
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -73,4 +73,4 @@ This module creates following resources.
 | <a name="output_targets"></a> [targets](#output\_targets) | A set of targets in the target group. |
 | <a name="output_type"></a> [type](#output\_type) | The target type of the target group. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC which the target group belongs to. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
