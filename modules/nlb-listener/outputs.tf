@@ -46,3 +46,19 @@ output "tls" {
     alpn_policy     = aws_lb_listener.this.alpn_policy
   } : null
 }
+
+output "resource_group" {
+  description = "The resource group created to manage resources in this module."
+  value = merge(
+    {
+      enabled = var.resource_group.enabled && var.module_tags_enabled
+    },
+    (var.resource_group.enabled && var.module_tags_enabled
+      ? {
+        arn  = module.resource_group[0].arn
+        name = module.resource_group[0].name
+      }
+      : {}
+    )
+  )
+}

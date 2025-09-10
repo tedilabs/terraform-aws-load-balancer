@@ -154,8 +154,10 @@ module "listener" {
     security_policy         = try(each.value.tls.security_policy, "ELBSecurityPolicy-2016-08")
   }
 
-  resource_group_enabled = false
-  module_tags_enabled    = false
+  resource_group = {
+    enabled = false
+  }
+  module_tags_enabled = false
 
   tags = merge(
     local.module_tags,

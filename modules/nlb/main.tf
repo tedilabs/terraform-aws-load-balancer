@@ -174,8 +174,10 @@ module "listener" {
     alpn_policy             = each.value.tls.alpn_policy
   }
 
-  resource_group_enabled = false
-  module_tags_enabled    = false
+  resource_group = {
+    enabled = false
+  }
+  module_tags_enabled = false
 
   tags = merge(
     local.module_tags,
