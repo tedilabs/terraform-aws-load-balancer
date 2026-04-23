@@ -24,6 +24,10 @@ locals {
 # NLB Listener
 ###################################################
 
+# INFO: Not supported attributes
+# - `mutual_authentication` (ALB-only)
+# - `routing_http_response_*` (ALB-only)
+# - `routing_http_request_*` (ALB-only)
 resource "aws_lb_listener" "this" {
   region = var.region
 
@@ -32,15 +36,60 @@ resource "aws_lb_listener" "this" {
   port     = var.port
   protocol = var.protocol
 
+
   ## TLS
   certificate_arn = local.tls_enabled ? var.tls.certificate : null
   ssl_policy      = local.tls_enabled ? var.tls.security_policy : null
   alpn_policy     = local.tls_enabled ? var.tls.alpn_policy : null
 
-  default_action {
-    type             = "forward"
-    target_group_arn = var.target_group
+
+  ## Actions
+  dynamic "default_action" {
+    for_each = (var.default_action_type == "FORWARD"
+      ? [var.default_action_parameters]
+      : []
+    )
+
+    content {
+      type = "forward"
+
+      target_group_arn = default_action.value.target_group
+    }
   }
+
+  dynamic "default_action" {
+    for_each = (var.default_action_type == "WEIGHTED_FORWARD"
+      ? [var.default_action_parameters]
+      : []
+    )
+
+    content {
+      type = "forward"
+
+      forward {
+        dynamic "target_group" {
+          for_each = default_action.value.targets
+          iterator = target
+
+          content {
+            arn    = target.value.target_group
+            weight = target.value.weight
+          }
+        }
+        stickiness {
+          enabled  = default_action.value.stickiness_duration > 0
+          duration = default_action.value.stickiness_duration
+        }
+      }
+    }
+  }
+
+
+  ## Attributes
+  tcp_idle_timeout_seconds = (contains(["TCP", "TCP_UDP"], var.protocol)
+    ? var.tcp_idle_timeout
+    : null
+  )
 
   tags = merge(
     {
