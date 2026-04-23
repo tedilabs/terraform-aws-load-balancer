@@ -1,3 +1,8 @@
+output "region" {
+  description = "The AWS region this module resources resides in."
+  value       = aws_lb_target_group.this.region
+}
+
 output "load_balancers" {
   description = "The ARNs (Amazon Resource Name) of the load balancers associated with the target group."
   value       = aws_lb_target_group.this.load_balancer_arns

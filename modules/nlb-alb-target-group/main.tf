@@ -30,6 +30,8 @@ locals {
 # - `proxy_protocol_v2`
 # - `slow_start`
 resource "aws_lb_target_group" "this" {
+  region = var.region
+
   name = var.name
 
   vpc_id = var.vpc_id
@@ -83,6 +85,8 @@ resource "aws_lb_target_group" "this" {
 # - `availability_zone`
 resource "aws_lb_target_group_attachment" "this" {
   count = length(var.targets) > 0 ? 1 : 0
+
+  region = var.region
 
   target_group_arn = aws_lb_target_group.this.arn
 

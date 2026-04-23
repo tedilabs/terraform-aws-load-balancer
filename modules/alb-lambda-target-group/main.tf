@@ -35,6 +35,8 @@ locals {
 # - `stickiness`
 # - `vpc_id`
 resource "aws_lb_target_group" "this" {
+  region = var.region
+
   name = var.name
 
   target_type = "lambda"
@@ -76,6 +78,8 @@ resource "aws_lb_target_group" "this" {
 resource "aws_lb_target_group_attachment" "this" {
   count = length(var.targets) > 0 ? 1 : 0
 
+  region = var.region
+
   target_group_arn = aws_lb_target_group.this.arn
 
   # TODO: divide function name and alias
@@ -94,6 +98,8 @@ resource "aws_lb_target_group_attachment" "this" {
 
 resource "aws_lambda_permission" "this" {
   count = length(var.targets) > 0 ? 1 : 0
+
+  region = var.region
 
   function_name = tolist(var.targets)[0].lambda_function
 

@@ -1,3 +1,8 @@
+output "region" {
+  description = "The AWS region this module resources resides in."
+  value       = aws_lb_listener.this.region
+}
+
 output "arn" {
   description = "The Amazon Resource Name (ARN) of the listener."
   value       = aws_lb_listener.this.arn

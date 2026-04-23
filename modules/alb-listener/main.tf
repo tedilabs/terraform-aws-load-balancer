@@ -27,6 +27,8 @@ locals {
 # INFO: Not supported attributes
 # - `alpn_policy`
 resource "aws_lb_listener" "this" {
+  region = var.region
+
   load_balancer_arn = var.load_balancer
 
   port     = var.port
@@ -155,6 +157,8 @@ resource "aws_lb_listener_rule" "this" {
     for rule in var.rules :
     rule.priority => rule
   }
+
+  region = var.region
 
   listener_arn = aws_lb_listener.this.arn
 
@@ -332,6 +336,8 @@ resource "aws_lb_listener_rule" "this" {
 
 resource "aws_lb_listener_certificate" "this" {
   for_each = toset(local.tls_enabled ? var.tls.additional_certificates : [])
+
+  region = var.region
 
   listener_arn    = aws_lb_listener.this.arn
   certificate_arn = each.key

@@ -34,6 +34,8 @@ locals {
 # - `preserve_client_ip`
 # - `proxy_protocol_v2`
 resource "aws_lb_target_group" "this" {
+  region = var.region
+
   name = var.name
 
   vpc_id = var.vpc_id
@@ -104,6 +106,8 @@ resource "aws_lb_target_group_attachment" "this" {
     for target in var.targets :
     target.instance => target
   }
+
+  region = var.region
 
   target_group_arn = aws_lb_target_group.this.arn
 

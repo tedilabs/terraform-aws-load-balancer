@@ -80,6 +80,8 @@ locals {
 # - `subnets`
 # - `xff_header_processing_mode`
 resource "aws_lb" "this" {
+  region = var.region
+
   name = var.name
 
   load_balancer_type = lower(local.load_balancer_type)
@@ -159,6 +161,8 @@ module "listener" {
     for listener in var.listeners :
     listener.port => listener
   }
+
+  region = var.region
 
   load_balancer = aws_lb.this.arn
 

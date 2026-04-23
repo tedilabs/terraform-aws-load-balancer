@@ -10,21 +10,21 @@ This module creates following resources.
 ## Requirements
 
 | Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.30 |
+| ---- | ------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.22 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.12.0 |
+| ---- | ------- |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.42.0 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_listener"></a> [listener](#module\_listener) | ../nlb-listener | n/a |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | tedilabs/misc/aws//modules/resource-group | ~> 0.12.0 |
 | <a name="module_security_group"></a> [security\_group](#module\_security\_group) | tedilabs/network/aws//modules/security-group | ~> 0.32.0 |
@@ -32,7 +32,7 @@ This module creates following resources.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
 | [terraform_data.replace_trigger](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
@@ -41,7 +41,7 @@ This module creates following resources.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_name"></a> [name](#input\_name) | (Required) The name of the load balancer. This name must be unique within your AWS account, can have a maximum of 32 characters, must contain only alphanumeric characters or hyphens, and must not begin or end with a hyphen. | `string` | n/a | yes |
 | <a name="input_access_log"></a> [access\_log](#input\_access\_log) | (Optional) A configuration for the access logs for the load balancer. Access logs deliver detailed logs of all requests made to your Elastic Load Balancer. `access_log` as defined below.<br/>    (Optional) `enabled` - Indicates whether to enable access logs. Defaults to `false`.<br/>    (Optional) `s3_bucket` - A configuration of the S3 Bucket for access logs. `s3_bucket` as defined below.<br/>      (Required) `name` - The name of the S3 bucket used to store the access logs.<br/>      (Optional) `key_prefix` - The key prefix for the specified S3 bucket. | <pre>object({<br/>    enabled = optional(bool, false)<br/>    s3_bucket = optional(object({<br/>      name       = optional(string)<br/>      key_prefix = optional(string, "")<br/>    }), {})<br/>  })</pre> | `{}` | no |
 | <a name="input_cross_zone_load_balancing_enabled"></a> [cross\_zone\_load\_balancing\_enabled](#input\_cross\_zone\_load\_balancing\_enabled) | (Optional) Cross-zone load balancing distributes traffic evenly across all targets in the Availability Zones enabled for the load balancer. Indicates whether to enable cross-zone load balancing. Defaults to `false`. Regional data transfer charges may apply when cross-zone load balancing is enabled. | `bool` | `false` | no |
@@ -52,6 +52,7 @@ This module creates following resources.
 | <a name="input_listeners"></a> [listeners](#input\_listeners) | (Optional) A list of listener configurations of the network load balancer. Listeners listen for connection requests using their `protocol` and `port`. Each value of `listener` block as defined below.<br/>    (Required) `port` - The number of port on which the listener of load balancer is listening.<br/>    (Required) `protocol` - The protocol for connections from clients to the load balancer. Valid values are `TCP`, `TLS`, `UDP` and `TCP_UDP`. Not valid to use `UDP` or `TCP_UDP` if dual-stack mode is enabled on the load balancer.<br/>    (Required) `target_group` - The ARN of the target group to which to route traffic.<br/>    (Optional) `tls` - The configuration for TLS listener of the load balancer. Required if `protocol` is `TLS`. `tls` block as defined below.<br/>      (Optional) `certificate` - The ARN of the default SSL server certificate. For adding additional SSL certificates, see the `additional_certificates` variable.<br/>      (Optional) `additional_certificates` - A set of ARNs of the certificate to attach to the listener. This is for additional certificates and does not replace the default certificate on the listener.<br/>      (Optional) `security_policy` - The name of security policy for a Secure Socket Layer (SSL) negotiation configuration. This is used to negotiate SSL connections with clients. Required if protocol is `TLS`. Recommend using the `ELBSecurityPolicy-TLS13-1-2-2021-06` security policy. This security policy includes TLS 1.3, which is optimized for security and performance, and is backward compatible with TLS 1.2.<br/>      (Optional) `alpn_policy` - The policy of the Application-Layer Protocol Negotiation (ALPN) to select. ALPN is a TLS extension that includes the protocol negotiation within the exchange of hello messages. Can be set if `protocol` is `TLS`. Valid values are `HTTP1Only`, `HTTP2Only`, `HTTP2Optional`, `HTTP2Preferred`, and `None`. Defaults to `None`. | <pre>list(object({<br/>    port         = number<br/>    protocol     = string<br/>    target_group = string<br/>    tls = optional(object({<br/>      certificate             = optional(string)<br/>      additional_certificates = optional(set(string), [])<br/>      security_policy         = optional(string, "ELBSecurityPolicy-TLS13-1-2-2021-06")<br/>      alpn_policy             = optional(string, "None")<br/>    }), {})<br/>  }))</pre> | `[]` | no |
 | <a name="input_module_tags_enabled"></a> [module\_tags\_enabled](#input\_module\_tags\_enabled) | (Optional) Whether to create AWS Resource Tags for the module informations. | `bool` | `true` | no |
 | <a name="input_network_mapping"></a> [network\_mapping](#input\_network\_mapping) | (Optional) The configuration for the load balancer how routes traffic to targets in which subnets, and in accordance with IP address settings. Select at least one Availability Zone and one subnet for each zone. We recommend selecting at least two Availability Zones. The load balancer will route traffic only to targets in the selected Availability Zones. Zones that are not supported by the load balancer or VPC cannot be selected. Subnets can be added, but not removed, once a load balancer is created. Each key of `network_mapping` is the availability zone id like `apne2-az1`, `use1-az1`. Each value of `network_mapping` block as defined below.<br/>    (Required) `subnet` - The id of the subnet of which to attach to the load balancer. You can specify only one subnet per Availability Zone.<br/>    (Optional) `private_ipv4_address` - A private ipv4 address within the subnet to assign to the internal load balancer.<br/>    (Optional) `ipv6_address` - An ipv6 address within the subnet to assign to the internet-facing load balancer.<br/>    (Optional) `elastic_ip` - The allocation ID of the Elastic IP address. | <pre>map(object({<br/>    subnet               = string<br/>    private_ipv4_address = optional(string)<br/>    ipv6_address         = optional(string)<br/>    elastic_ip           = optional(string)<br/>  }))</pre> | `{}` | no |
+| <a name="input_region"></a> [region](#input\_region) | (Optional) The region in which to create the module resources. If not provided, the module resources will be created in the provider's configured region. | `string` | `null` | no |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | (Optional) A configurations of Resource Group for this module. `resource_group` as defined below.<br/>    (Optional) `enabled` - Whether to create Resource Group to find and group AWS resources which are created by this module. Defaults to `true`.<br/>    (Optional) `name` - The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. If not provided, a name will be generated using the module name and instance name.<br/>    (Optional) `description` - The description of Resource Group. Defaults to `Managed by Terraform.`. | <pre>object({<br/>    enabled     = optional(bool, true)<br/>    name        = optional(string, "")<br/>    description = optional(string, "Managed by Terraform.")<br/>  })</pre> | `{}` | no |
 | <a name="input_route53_resolver_availability_zone_affinity"></a> [route53\_resolver\_availability\_zone\_affinity](#input\_route53\_resolver\_availability\_zone\_affinity) | (Optional) A configuration to determine how traffic is distributed among the load balancer Availability Zones. Only applied to internal requests for clients resolving the load balancer DNS name using Route 53 Resolver. Valid values are `ANY`, `PARTIAL`, `ALL`. Defaults to `ANY`.<br/>    `ANY` - Client DNS queries will resolve to healthy load balancer IP addresses across all load balancer Availability Zones.<br/>    `PARTIAL` - 85% of client DNS queries will favor load balancer IP addresses in their own Availability Zone. The remaining queries will resolve to any zone. Resolving to any zone may also occur if there are no healthy load balancer IP addresses in the client's zone.<br/>    `ALL` - Client DNS queries will favor load balancer IP addresses in their own Availability Zone. Queries may resolve to other zones if there are no healthy load balancer IP addresses in their own zone.<br/>  balancer Availability Zones. | `string` | `"ANY"` | no |
 | <a name="input_security_group_evaluation_on_privatelink_enabled"></a> [security\_group\_evaluation\_on\_privatelink\_enabled](#input\_security\_group\_evaluation\_on\_privatelink\_enabled) | (Optional) Whether to evaluate inbound security group rules for traffic sent to a Network Load Balancer through AWS PrivateLink. Defaults to `false`. | `bool` | `false` | no |
@@ -62,7 +63,7 @@ This module creates following resources.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_access_log"></a> [access\_log](#output\_access\_log) | The configuration for access logs of the load balancer. |
 | <a name="output_arn"></a> [arn](#output\_arn) | The Amazon Resource Name (ARN) of the load balancer. |
 | <a name="output_arn_suffix"></a> [arn\_suffix](#output\_arn\_suffix) | The ARN suffix for use with CloudWatch Metrics. |
@@ -76,6 +77,7 @@ This module creates following resources.
 | <a name="output_listeners"></a> [listeners](#output\_listeners) | The listeners of the network load balancer. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the load balancer. |
 | <a name="output_network_mapping"></a> [network\_mapping](#output\_network\_mapping) | The configuration for the load balancer how routes traffic to targets in which subnets and IP address settings. |
+| <a name="output_region"></a> [region](#output\_region) | The AWS region this module resources resides in. |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | The resource group created to manage resources in this module. |
 | <a name="output_security_group_evaluation_on_privatelink_enabled"></a> [security\_group\_evaluation\_on\_privatelink\_enabled](#output\_security\_group\_evaluation\_on\_privatelink\_enabled) | Whether to evaluate inbound security group rules for traffic sent to a Network Load Balancer through AWS PrivateLink. |
 | <a name="output_security_groups"></a> [security\_groups](#output\_security\_groups) | A set of security group IDs which is assigned to the load balancer. |

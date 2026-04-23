@@ -73,6 +73,8 @@ locals {
 # - `subnets`
 # - `xff_header_processing_mode`
 resource "aws_lb" "this" {
+  region = var.region
+
   name = var.name
 
   load_balancer_type = lower(local.load_balancer_type)
@@ -120,6 +122,8 @@ resource "aws_lb" "this" {
 # - `tags`
 resource "aws_lb_listener" "this" {
   count = length(var.listeners) > 0 ? 1 : 0
+
+  region = var.region
 
   load_balancer_arn = aws_lb.this.arn
 
