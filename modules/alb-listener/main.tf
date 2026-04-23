@@ -17,6 +17,11 @@ locals {
 locals {
   load_balancer_name = split("/", var.load_balancer)[2]
   tls_enabled        = var.protocol == "HTTPS"
+
+  rule_transform_type = {
+    "HOST_HEADER_REWRITE" = "host-header-rewrite"
+    "URL_REWRITE"         = "url-rewrite"
+  }
 }
 
 
@@ -25,7 +30,9 @@ locals {
 ###################################################
 
 # INFO: Not supported attributes
-# - `alpn_policy`
+# - `alpn_policy` (NLB only)
+# - `tcp_idle_timeout_seconds` (NLB & GWLB only)
+# TODO: AUTHENTICATE_COGNITO / AUTHENTICATE_OIDC / JWT_VALIDATION action types
 resource "aws_lb_listener" "this" {
   region = var.region
 
@@ -34,10 +41,25 @@ resource "aws_lb_listener" "this" {
   port     = var.port
   protocol = var.protocol
 
+
   ## TLS
   certificate_arn = local.tls_enabled ? var.tls.certificate : null
   ssl_policy      = local.tls_enabled ? var.tls.security_policy : null
 
+  dynamic "mutual_authentication" {
+    for_each = var.mtls.mode != "OFF" ? [var.mtls] : []
+    iterator = mtls
+
+    content {
+      mode                             = lower(mtls.value.mode)
+      trust_store_arn                  = mtls.value.trust_store
+      ignore_client_certificate_expiry = mtls.value.ignore_client_certificate_expiry
+      advertise_trust_store_ca_names   = mtls.value.advertise_trust_store_ca_names ? "on" : "off"
+    }
+  }
+
+
+  ## Actions
   dynamic "default_action" {
     for_each = (var.default_action_type == "FORWARD"
       ? [var.default_action_parameters]
@@ -63,19 +85,16 @@ resource "aws_lb_listener" "this" {
       forward {
         dynamic "target_group" {
           for_each = default_action.value.targets
+          iterator = target
 
           content {
-            arn    = target_group.value.target_group
-            weight = try(target_group.value.weight, 1)
+            arn    = target.value.target_group
+            weight = target.value.weight
           }
         }
-        dynamic "stickiness" {
-          for_each = try(default_action.value.stickiness_duration, 0) > 0 ? ["go"] : []
-
-          content {
-            enabled  = true
-            duration = default_action.value.stickiness_duration
-          }
+        stickiness {
+          enabled  = default_action.value.stickiness_duration > 0
+          duration = default_action.value.stickiness_duration
         }
       }
     }
@@ -91,9 +110,9 @@ resource "aws_lb_listener" "this" {
       type = "fixed-response"
 
       fixed_response {
-        status_code  = try(default_action.value.status_code, 503)
-        content_type = try(default_action.value.content_type, "text/plain")
-        message_body = try(default_action.value.data, "")
+        status_code  = default_action.value.status_code
+        content_type = default_action.value.content_type
+        message_body = default_action.value.data
       }
     }
   }
@@ -109,11 +128,11 @@ resource "aws_lb_listener" "this" {
 
       redirect {
         status_code = "HTTP_301"
-        protocol    = try(default_action.value.protocol, "#{protocol}")
-        host        = try(default_action.value.host, "#{host}")
-        port        = try(default_action.value.port, "#{port}")
-        path        = try(default_action.value.path, "/#{path}")
-        query       = try(default_action.value.query, "#{query}")
+        protocol    = default_action.value.protocol
+        host        = default_action.value.host
+        port        = default_action.value.port
+        path        = default_action.value.path
+        query       = default_action.value.query
       }
     }
   }
@@ -129,14 +148,43 @@ resource "aws_lb_listener" "this" {
 
       redirect {
         status_code = "HTTP_302"
-        protocol    = try(default_action.value.protocol, "#{protocol}")
-        host        = try(default_action.value.host, "#{host}")
-        port        = try(default_action.value.port, "#{port}")
-        path        = try(default_action.value.path, "/#{path}")
-        query       = try(default_action.value.query, "#{query}")
+        protocol    = default_action.value.protocol
+        host        = default_action.value.host
+        port        = default_action.value.port
+        path        = default_action.value.path
+        query       = default_action.value.query
       }
     }
   }
+
+
+  ## Attributes
+  # Response Headers (Overwrite)
+  routing_http_response_strict_transport_security_header_value = var.overwrite_response_headers.strict_transport_security
+  routing_http_response_content_security_policy_header_value   = var.overwrite_response_headers.content_security_policy
+  routing_http_response_x_content_type_options_header_value    = var.overwrite_response_headers.x_content_type_options
+  routing_http_response_x_frame_options_header_value           = var.overwrite_response_headers.x_frame_options
+
+  routing_http_response_access_control_allow_origin_header_value      = var.overwrite_response_headers.cors.allow_origin
+  routing_http_response_access_control_allow_methods_header_value     = var.overwrite_response_headers.cors.allow_methods
+  routing_http_response_access_control_allow_headers_header_value     = var.overwrite_response_headers.cors.allow_headers
+  routing_http_response_access_control_allow_credentials_header_value = var.overwrite_response_headers.cors.allow_credentials
+  routing_http_response_access_control_expose_headers_header_value    = var.overwrite_response_headers.cors.expose_headers
+  routing_http_response_access_control_max_age_header_value           = var.overwrite_response_headers.cors.max_age
+
+  routing_http_response_server_enabled = var.server_response_header_enabled
+
+  # Request Headers (Rename)
+  routing_http_request_x_amzn_mtls_clientcert_header_name               = lookup(var.rename_mtls_request_headers, "X-Amzn-Mtls-Clientcert", null)
+  routing_http_request_x_amzn_mtls_clientcert_serial_number_header_name = lookup(var.rename_mtls_request_headers, "X-Amzn-Mtls-Clientcert-Serial-Number", null)
+  routing_http_request_x_amzn_mtls_clientcert_issuer_header_name        = lookup(var.rename_mtls_request_headers, "X-Amzn-Mtls-Clientcert-Issuer", null)
+  routing_http_request_x_amzn_mtls_clientcert_leaf_header_name          = lookup(var.rename_mtls_request_headers, "X-Amzn-Mtls-Clientcert-Leaf", null)
+  routing_http_request_x_amzn_mtls_clientcert_subject_header_name       = lookup(var.rename_mtls_request_headers, "X-Amzn-Mtls-Clientcert-Subject", null)
+  routing_http_request_x_amzn_mtls_clientcert_validity_header_name      = lookup(var.rename_mtls_request_headers, "X-Amzn-Mtls-Clientcert-Validity", null)
+
+  routing_http_request_x_amzn_tls_version_header_name      = lookup(var.rename_tls_request_headers, "X-Amzn-Tls-Version", null)
+  routing_http_request_x_amzn_tls_cipher_suite_header_name = lookup(var.rename_tls_request_headers, "X-Amzn-Tls-Cipher-Suite", null)
+
 
   tags = merge(
     {
@@ -316,6 +364,36 @@ resource "aws_lb_listener_rule" "this" {
         port        = try(action.value.port, "#{port}")
         path        = try(action.value.path, "/#{path}")
         query       = try(action.value.query, "#{query}")
+      }
+    }
+  }
+
+  dynamic "transform" {
+    for_each = try(each.value.transforms, [])
+
+    content {
+      type = local.rule_transform_type[transform.value.type]
+
+      dynamic "host_header_rewrite_config" {
+        for_each = transform.value.type == "HOST_HEADER_REWRITE" ? [transform.value] : []
+
+        content {
+          rewrite {
+            regex   = host_header_rewrite_config.value.rewrite.regex
+            replace = host_header_rewrite_config.value.rewrite.replace
+          }
+        }
+      }
+
+      dynamic "url_rewrite_config" {
+        for_each = transform.value.type == "URL_REWRITE" ? [transform.value] : []
+
+        content {
+          rewrite {
+            regex   = url_rewrite_config.value.rewrite.regex
+            replace = url_rewrite_config.value.rewrite.replace
+          }
+        }
       }
     }
   }
