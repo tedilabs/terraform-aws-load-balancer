@@ -27,7 +27,7 @@ This module creates following resources.
 | ---- | ------ | ------- |
 | <a name="module_listener"></a> [listener](#module\_listener) | ../alb-listener | n/a |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | tedilabs/misc/aws//modules/resource-group | ~> 0.12.0 |
-| <a name="module_security_group"></a> [security\_group](#module\_security\_group) | tedilabs/network/aws//modules/security-group | ~> 0.32.0 |
+| <a name="module_security_group"></a> [security\_group](#module\_security\_group) | tedilabs/network/aws//modules/security-group | ~> 1.0.0 |
 
 ## Resources
 
