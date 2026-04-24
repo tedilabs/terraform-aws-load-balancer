@@ -63,13 +63,24 @@ variable "targets" {
   (Optional) A set of targets to add to the target group. Each value of `targets` block as defined below.
     (Required) `instance` - This is the Instance ID for an instance, or the container ID for an ECS container.
     (Optional) `port` - The port on which targets receive traffic.
+    (Optional) `quic_server` - The ID of the QUIC server for the targets. Required when the target group protocol is `QUIC` or `TCP_QUIC`. The value must be unique at the listener level.
   EOF
   type = set(object({
-    instance = string
-    port     = optional(number, null)
+    instance    = string
+    port        = optional(number)
+    quic_server = optional(string)
   }))
   default  = []
   nullable = false
+
+  validation {
+    condition = alltrue([
+      for target in var.targets :
+      target.quic_server != null
+      if contains(["QUIC", "TCP_QUIC"], var.protocol)
+    ])
+    error_message = "The `quic_server` value is required when the target group protocol is `QUIC` or `TCP_QUIC`."
+  }
 }
 
 variable "on_deregistration" {

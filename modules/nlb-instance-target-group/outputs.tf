@@ -56,10 +56,18 @@ output "protocol" {
 output "targets" {
   description = "A set of targets in the target group."
   value = [
-    for target in aws_lb_target_group_attachment.this : {
-      instance = target.target_id
-      port     = target.port
-    }
+    for target in aws_lb_target_group_attachment.this : merge(
+      {
+        instance = target.target_id
+        port     = target.port
+      },
+      (contains(["QUIC", "TCP_QUIC"], var.protocol)
+        ? {
+          quic_server = target.quic_server_id
+        }
+        : {}
+      )
+    )
   ]
 }
 

@@ -175,4 +175,6 @@ resource "aws_lb_target_group_attachment" "this" {
 
   target_id = each.key
   port      = try(each.value.port, var.port)
+
+  quic_server_id = each.value.quic_server
 }
