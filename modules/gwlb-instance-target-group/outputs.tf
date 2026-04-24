@@ -61,7 +61,22 @@ output "targets" {
 output "attributes" {
   description = "Attributes of the Instance target group of gateway load balancer."
   value = {
-    deregistration_delay = aws_lb_target_group.this.deregistration_delay
+    deregistration_delay = tonumber(aws_lb_target_group.this.deregistration_delay)
+  }
+}
+
+output "target_failover" {
+  description = "The configuration of target failover for the target group."
+  value = {
+    rebalance_on_deregistration = aws_lb_target_group.this.target_failover[0].on_deregistration == "rebalance"
+    rebalance_on_unhealthy      = aws_lb_target_group.this.target_failover[0].on_unhealthy == "rebalance"
+  }
+}
+
+output "flow_stickiness" {
+  description = "The configuration of flow stickiness for the target group."
+  value = {
+    type = var.flow_stickiness.type
   }
 }
 
@@ -95,3 +110,20 @@ output "resource_group" {
     )
   )
 }
+
+# output "debug" {
+#   value = {
+#     target_group = {
+#       for k, v in aws_lb_target_group.this :
+#       k => v
+#       if !contains(["id", "arn", "arn_suffix", "name", "tags", "tags_all", "region", "vpc_id", "target_type", "target_group_health", "target_control_port", "protocol", "protocol_version", "health_check", "port", "name_prefix", "load_balancer_arns", "lambda_multi_value_headers_enabled", "preserve_client_ip", "proxy_protocol_v2", "load_balancing_algorithm_type", "load_balancing_anomaly_mitigation", "load_balancing_cross_zone_enabled", "ip_address_type", "slow_start", "connection_termination", "deregistration_delay", "target_failover", "target_health_state", "stickiness"], k)
+#     }
+#     targets = [
+#       for target in aws_lb_target_group_attachment.this : {
+#         for k, v in target :
+#         k => v
+#         if !contains(["region", "target_group_arn", "target_id", "port", "quic_server_id"], k)
+#       }
+#     ]
+#   }
+# }
