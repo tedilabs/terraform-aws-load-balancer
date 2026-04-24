@@ -38,6 +38,11 @@ output "type" {
   value       = upper(aws_lb_target_group.this.target_type)
 }
 
+output "ip_address_type" {
+  description = "The type of IP addresses used by the target group."
+  value       = upper(aws_lb_target_group.this.ip_address_type)
+}
+
 output "port" {
   description = "The port number on which the target receive trrafic."
   value       = aws_lb_target_group.this.port
@@ -74,14 +79,50 @@ output "attributes" {
         : null
       )
       cross_zone_strategy = var.load_balancing.cross_zone_strategy
+      slow_start_duration = aws_lb_target_group.this.slow_start
+      stickiness = {
+        enabled  = aws_lb_target_group.this.stickiness[0].enabled
+        type     = upper(aws_lb_target_group.this.stickiness[0].type)
+        duration = aws_lb_target_group.this.stickiness[0].cookie_duration
+        cookie   = aws_lb_target_group.this.stickiness[0].cookie_name
+      }
     }
-    slow_start_duration = aws_lb_target_group.this.slow_start
-    stickiness = {
-      enabled  = aws_lb_target_group.this.stickiness[0].enabled
-      type     = upper(aws_lb_target_group.this.stickiness[0].type)
-      duration = aws_lb_target_group.this.stickiness[0].cookie_duration
-      cookie   = var.stickiness_cookie
+  }
+}
+
+output "dns_failover_condition" {
+  description = "The configuration for DNS failover requirements."
+  value = {
+    min_healthy_targets = {
+      count = (aws_lb_target_group.this.target_group_health[0].dns_failover[0].minimum_healthy_targets_count != "off"
+        ? tonumber(aws_lb_target_group.this.target_group_health[0].dns_failover[0].minimum_healthy_targets_count)
+        : 0
+      )
+      percentage = (aws_lb_target_group.this.target_group_health[0].dns_failover[0].minimum_healthy_targets_percentage != "off"
+        ? tonumber(aws_lb_target_group.this.target_group_health[0].dns_failover[0].minimum_healthy_targets_percentage)
+        : 0
+      )
     }
+  }
+}
+
+output "unhealthy_state_routing_condition" {
+  description = "The configuration for unhealthy state routing requirements."
+  value = {
+    min_healthy_targets = {
+      count = tonumber(aws_lb_target_group.this.target_group_health[0].unhealthy_state_routing[0].minimum_healthy_targets_count)
+      percentage = (aws_lb_target_group.this.target_group_health[0].unhealthy_state_routing[0].minimum_healthy_targets_percentage != "off"
+        ? tonumber(aws_lb_target_group.this.target_group_health[0].unhealthy_state_routing[0].minimum_healthy_targets_percentage)
+        : 0
+      )
+    }
+  }
+}
+
+output "target_optimizer" {
+  description = "The Target Optimizer configuration of the target group."
+  value = {
+    target_control_port = aws_lb_target_group.this.target_control_port
   }
 }
 
@@ -115,3 +156,20 @@ output "resource_group" {
     )
   )
 }
+
+# output "debug" {
+#   value = {
+#     target_group = {
+#       for k, v in aws_lb_target_group.this :
+#       k => v
+#       if !contains(["id", "arn", "arn_suffix", "name", "tags", "tags_all", "deregistration_delay", "health_check", "port", "protocol", "protocol_version", "region", "lambda_multi_value_headers_enabled", "name_prefix", "ip_address_type", "vpc_id", "target_type", "load_balancing_algorithm_type", "load_balancing_cross_zone_enabled", "load_balancing_anomaly_mitigation", "slow_start", "load_balancer_arns", "stickiness", "preserve_client_ip", "proxy_protocol_v2", "connection_termination", "target_control_port", "target_failover", "target_health_state", "target_group_health"], k)
+#     }
+#     targets = [
+#       for target in aws_lb_target_group_attachment.this : {
+#         for k, v in target :
+#         k => v
+#         if !contains(["region", "target_group_arn", "target_id", "port", "quic_server_id"], k)
+#       }
+#     ]
+#   }
+# }
