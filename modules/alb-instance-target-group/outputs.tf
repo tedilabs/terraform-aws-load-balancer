@@ -69,9 +69,9 @@ output "targets" {
 }
 
 output "attributes" {
-  description = "Attributes of the Instance target group of network load balancer."
+  description = "Attributes of the Instance target group of application load balancer."
   value = {
-    deregistration_delay = aws_lb_target_group.this.deregistration_delay
+    deregistration_delay = tonumber(aws_lb_target_group.this.deregistration_delay)
     load_balancing = {
       algorithm = upper(aws_lb_target_group.this.load_balancing_algorithm_type)
       anomaly_mitigation_enabled = (var.load_balancing.algorithm == "WEIGHTED_RANDOM"
