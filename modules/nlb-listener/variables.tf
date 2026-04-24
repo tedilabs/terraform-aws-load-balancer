@@ -24,7 +24,7 @@ variable "protocol" {
 
   validation {
     condition     = contains(["TCP", "TLS", "UDP", "TCP_UDP", "QUIC", "TCP_QUIC"], var.protocol)
-    error_message = "Valid values are `TCP`, `TLS`, `UDP`, `TCP_UDP`, `QUIC` and `TCP_QUIC`. Not valid to use `UDP` or `TCP_UDP` if dual-stack mode is enabled on the load balancer."
+    error_message = "Valid values are `TCP`, `TLS`, `UDP`, `TCP_UDP`, `QUIC` and `TCP_QUIC`. Not valid to use `UDP` or `TCP_UDP` if dual-stack mode is enabled on the load balancer. Not valid to use `QUIC` or `TCP_QUIC` if security groups are configured or dual-stack mode is enabled."
   }
 }
 
