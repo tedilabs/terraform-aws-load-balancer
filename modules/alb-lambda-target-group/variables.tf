@@ -42,7 +42,7 @@ variable "multi_value_headers_enabled" {
 
 variable "health_check" {
   description = <<EOF
-  (Optional) Health Check configuration block. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.
+  (Optional) A configurations for Health Check of the target group. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.
     (Optional) `enabled` - Whether health checks are enabled. Health checks count as a request for your Lambda function. Defaults to `false`.
     (Optional) `path` - Use the default path of `/` to ping the root, or specify a custom path if preferred.
     (Optional) `success_codes` - The HTTP codes to use when checking for a successful response from a target. You can specify multiple values (for example, `200,202`) or a range of values (for example, `200-299`). Defaults to `200`.
@@ -65,18 +65,36 @@ variable "health_check" {
   nullable = false
 
   validation {
+    condition     = length(var.health_check.path) <= 1024
+    error_message = "A path can have a maximum of 1024 characters."
+  }
+  validation {
     condition = alltrue([
-      length(var.health_check.path) <= 1024,
-      var.health_check.healthy_threshold <= 10,
       var.health_check.healthy_threshold >= 2,
-      var.health_check.unhealthy_threshold <= 10,
+      var.health_check.healthy_threshold <= 10,
+    ])
+    error_message = "Valid value range for `healthy_threshold` is 2 - 10."
+  }
+  validation {
+    condition = alltrue([
       var.health_check.unhealthy_threshold >= 2,
+      var.health_check.unhealthy_threshold <= 10,
+    ])
+    error_message = "Valid value range for `unhealthy_threshold` is 2 - 10."
+  }
+  validation {
+    condition = alltrue([
       var.health_check.interval >= 5,
       var.health_check.interval <= 300,
+    ])
+    error_message = "Valid value range for `interval` is 5 - 300."
+  }
+  validation {
+    condition = alltrue([
       var.health_check.timeout >= 2,
       var.health_check.timeout <= 120,
     ])
-    error_message = "Not valid parameters for `health_check`."
+    error_message = "Valid value range for `timeout` is 2 - 120."
   }
 }
 
@@ -98,9 +116,6 @@ variable "module_tags_enabled" {
 ###################################################
 # Resource Group
 ###################################################
-
-
-
 
 variable "resource_group" {
   description = <<EOF

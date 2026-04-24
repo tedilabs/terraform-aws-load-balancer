@@ -81,3 +81,20 @@ output "resource_group" {
     )
   )
 }
+
+# output "debug" {
+#   value = {
+#     target_group = {
+#       for k, v in aws_lb_target_group.this :
+#       k => v
+#       if !contains(["id", "arn", "arn_suffix", "name", "tags", "tags_all", "deregistration_delay", "port", "protocol", "protocol_version", "region", "ip_address_type", "lambda_multi_value_headers_enabled", "name_prefix", "load_balancer_arns", "stickiness", "load_balancing_algorithm_type", "load_balancing_cross_zone_enabled", "load_balancing_anomaly_mitigation", "proxy_protocol_v2", "preserve_client_ip", "connection_termination", "target_control_port", "target_type", "vpc_id", "slow_start", "target_failover", "health_check", "target_health_state", "target_group_health"], k)
+#     }
+#     targets = [
+#       for target in aws_lb_target_group_attachment.this : {
+#         for k, v in target :
+#         k => v
+#         if !contains(["region", "target_group_arn", "target_id", "port", "quic_server_id"], k)
+#       }
+#     ]
+#   }
+# }

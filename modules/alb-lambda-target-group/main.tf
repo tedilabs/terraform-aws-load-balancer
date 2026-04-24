@@ -33,6 +33,10 @@ locals {
 # - `port`
 # - `slow_start`
 # - `stickiness`
+# - `target_control_port`
+# - `target_failover`
+# - `target_group_health`
+# - `target_health_state`
 # - `vpc_id`
 resource "aws_lb_target_group" "this" {
   region = var.region
@@ -41,14 +45,17 @@ resource "aws_lb_target_group" "this" {
 
   target_type = "lambda"
 
+
   ## Attributes
   lambda_multi_value_headers_enabled = var.multi_value_headers_enabled
 
+
+  ## Health Check
   ## INFO: Not supported attributes
   # - `port`
   # - `protocol`
   health_check {
-    enabled = try(var.health_check.enabled, false)
+    enabled = var.health_check.enabled
 
     path    = var.health_check.path
     matcher = var.health_check.success_codes
@@ -74,6 +81,7 @@ resource "aws_lb_target_group" "this" {
 ###################################################
 
 # INFO: Not supported attributes
+# - `quic_server_id`
 # - `port`
 resource "aws_lb_target_group_attachment" "this" {
   count = length(var.targets) > 0 ? 1 : 0
