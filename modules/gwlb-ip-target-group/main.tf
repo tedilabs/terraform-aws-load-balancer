@@ -15,6 +15,8 @@ locals {
 }
 
 data "aws_vpc" "this" {
+  region = var.region
+
   id = var.vpc_id
 }
 
@@ -54,7 +56,9 @@ locals {
 # - `proxy_protocol_v2`
 # - `slow_start`
 # - `stickiness`
-# - `tags`
+# - `target_control_port`
+# - `target_group_health`
+# - `target_health_state`
 resource "aws_lb_target_group" "this" {
   region = var.region
 
@@ -66,52 +70,71 @@ resource "aws_lb_target_group" "this" {
   port        = local.port
   protocol    = "GENEVE"
 
+
   ## Attributes
   deregistration_delay = var.deregistration_delay
 
-  ## INFO: Too many bugs in terraform provider
-  # - `healthy_threshold` doesn't need to be same with `unhealthy_threashold`
-  # - `interval` doesn't apply to the acutal resource
-  # - `timeout` is not supported
-  dynamic "health_check" {
-    for_each = [merge(
-      var.health_check,
-      var.health_check.protocol != "TCP"
-      ? {
-        success_codes = "200-399"
-      }
-      : {
-        interval      = null
-        timeout       = null
-        success_codes = null
-        path          = null
-      },
-    )]
+  target_failover {
+    on_deregistration = var.target_failover.rebalance_on_deregistration ? "rebalance" : "no_rebalance"
+    on_unhealthy      = var.target_failover.rebalance_on_unhealthy ? "rebalance" : "no_rebalance"
+  }
+
+  dynamic "stickiness" {
+    for_each = var.flow_stickiness.type == "5-tuple" ? ["go"] : []
+
+    content {
+      enabled = false
+      type    = "source_ip_dest_ip_proto"
+    }
+  }
+  dynamic "stickiness" {
+    for_each = var.flow_stickiness.type == "3-tuple" ? ["go"] : []
 
     content {
       enabled = true
+      type    = "source_ip_dest_ip_proto"
+    }
+  }
+  dynamic "stickiness" {
+    for_each = var.flow_stickiness.type == "2-tuple" ? ["go"] : []
 
-      protocol = health_check.value.protocol
-      port = (health_check.value.port_override
-        ? health_check.value.port
-        : "traffic-port"
-      )
-      path    = health_check.value.path
-      matcher = health_check.value.success_codes
-
-      healthy_threshold   = health_check.value.healthy_threshold
-      unhealthy_threshold = health_check.value.unhealthy_threshold
-      interval            = health_check.value.interval
-      timeout             = health_check.value.timeout
+    content {
+      enabled = true
+      type    = "source_ip_dest_ip"
     }
   }
 
-  # INFO: Not supported on creation time. Only available on modification time.
+
+  ## Health Check
+  health_check {
+    enabled = true
+
+    protocol = var.health_check.protocol
+    port = (var.health_check.port_override
+      ? coalesce(var.health_check.port, 6081)
+      : "traffic-port"
+    )
+    path = (var.health_check.protocol != "TCP"
+      ? var.health_check.path
+      : null
+    )
+    matcher = (var.health_check.protocol != "TCP"
+      ? var.health_check.success_codes
+      : null
+    )
+
+    healthy_threshold   = var.health_check.healthy_threshold
+    unhealthy_threshold = var.health_check.unhealthy_threshold
+    interval            = var.health_check.interval
+    timeout             = var.health_check.timeout
+  }
+
+
   tags = merge(
-    # {
-    #   "Name" = local.metadata.name
-    # },
-    # local.module_tags,
+    {
+      "Name" = local.metadata.name
+    },
+    local.module_tags,
     var.tags,
   )
 }
@@ -121,6 +144,8 @@ resource "aws_lb_target_group" "this" {
 # Attachment for GWLB IP Target Group
 ###################################################
 
+# INFO: Not supported attributes
+# - `quic_server_id`
 resource "aws_lb_target_group_attachment" "this" {
   for_each = {
     for target in local.targets :
