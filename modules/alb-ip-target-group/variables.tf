@@ -19,10 +19,11 @@ variable "name" {
 variable "vpc_id" {
   description = "(Required) The ID of the VPC which the target group belongs to."
   type        = string
+  nullable    = false
 }
 
 variable "ip_address_type" {
-  description = "(Required) The type of IP addresses used by the target group. Valid values are `IPV4` or `IPV6`."
+  description = "(Optional) The type of IP addresses used by the target group. Valid values are `IPV4` or `IPV6`. Defaults to `IPV4`."
   type        = string
   default     = "IPV4"
   nullable    = false
@@ -78,7 +79,7 @@ variable "targets" {
   EOF
   type = set(object({
     ip_address = string
-    port       = optional(number, null)
+    port       = optional(number)
   }))
   default  = []
   nullable = false
@@ -102,11 +103,24 @@ variable "load_balancing" {
     (Optional) `algorithm` - Determines how the load balancer selects targets when routing requests. Valid values are `ROUND_ROBIN`, `LEAST_OUTSTANDING_REQUESTS` or `WEIGHTED_RANDOM`. Defaults to `ROUND_ROBIN`.
     (Optional) `anomaly_mitigation_enabled` - Whether to enable target anomaly mitigation. When a target is determined to be anomalous, traffic is automatically routed away so the target has an opportunity to recover. Target anomaly mitigation is only supported by the `WEIGHTED_RANDOM` load balancing algorithm type. Not compatible with the `slow_start_duration` attribute. Defaults to `false`.
     (Optional) `cross_zone_strategy` - Determines how the load balancer routes requests across the Availability Zones. Valid values are `ENABLED`, `DISABLED` or `INHERIT`. Defaults to `INHERIT` (Use load balancer configuration).
+    (Optional) `slow_start_duration` - The amount time for a newly registered targets to warm up before the load balancer sends them a full share of requests. During this period, targets receives an increasing share of requests until it reaches its fair share. Requires `30` to `900` seconds to enable, or `0` seconds to disable. Not compatible with the Least outstanding requests and Weighted random routing algorithms. Defaults to `0`.
+    (Optional) `stickiness` - A stickiness configuration for the target group. `stickiness` block as defined below.
+       (Optional) `enabled` - Whether to enable the type of stickiness associated with this target group. If enabled, the load balancer binds a client’s session to a specific instance within the target group. Defaults to `false`.
+       (Optional) `type` - The type of sticky sessions. Valid values are `LB_COOKIE` or `APP_COOKIE`. Defaults to `LB_COOKIE`.
+       (Optional) `duration` - The time period, in seconds, during which requests from a client should be routed to the same target. After this time period expires, the load balancer-generated cookie is considered stale. Valid values are from `1` to `604800` (1 week). Defaults to `86400` (1 day).
+       (Optional) `cookie` - The name of the application based cookie. `AWSALB`, `AWSALBAPP`, and `AWSALBTG` prefixes are reserved and cannot be used. Only needed when `type` is `APP_COOKIE`.
   EOF
   type = object({
     algorithm                  = optional(string, "ROUND_ROBIN")
     anomaly_mitigation_enabled = optional(bool, false)
     cross_zone_strategy        = optional(string, "INHERIT")
+    slow_start_duration        = optional(number, 0)
+    stickiness = optional(object({
+      enabled  = optional(bool, false)
+      type     = optional(string, "LB_COOKIE")
+      duration = optional(number, 86400)
+      cookie   = optional(string, "")
+    }), {})
   })
   default  = {}
   nullable = false
@@ -115,75 +129,141 @@ variable "load_balancing" {
     condition     = contains(["ROUND_ROBIN", "LEAST_OUTSTANDING_REQUESTS", "WEIGHTED_RANDOM"], var.load_balancing.algorithm)
     error_message = "Valid values are `ROUND_ROBIN`, `LEAST_OUTSTANDING_REQUESTS` and `WEIGHTED_RANDOM`."
   }
-
+  validation {
+    condition = anytrue([
+      !var.load_balancing.anomaly_mitigation_enabled,
+      var.load_balancing.algorithm == "WEIGHTED_RANDOM"
+    ])
+    error_message = "Target anomaly mitigation is only supported by the `WEIGHTED_RANDOM` load balancing algorithm type."
+  }
   validation {
     condition     = contains(["ENABLED", "DISABLED", "INHERIT"], var.load_balancing.cross_zone_strategy)
     error_message = "Valid values are `ENABLED`, `DISABLED` and `INHERIT`."
   }
-}
-
-variable "slow_start_duration" {
-  description = "(Optional) The amount time for a newly registered targets to warm up before the load balancer sends them a full share of requests. During this period, targets receives an increasing share of requests until it reaches its fair share. Requires `30` to `900` seconds to enable, or `0` seconds to disable. Not compatible with the Least outstanding requests and Weighted random routing algorithms."
-  type        = number
-  default     = 0
-  nullable    = false
-
   validation {
     condition = anytrue([
-      var.slow_start_duration == 0,
-      var.slow_start_duration <= 900 && var.slow_start_duration >= 30
+      var.load_balancing.slow_start_duration == 0,
+      !contains(["LEAST_OUTSTANDING_REQUESTS", "WEIGHTED_RANDOM"], var.load_balancing.algorithm),
     ])
-    error_message = "Requires `30` to `900` seconds to enable, or `0` seconds to disable. Not compatible with the Least outstanding requests and Weighted random routing algorithms."
+    error_message = "The `slow_start_duration` attribute is not compatible with the Least outstanding requests and Weighted random routing algorithms."
   }
-}
-
-variable "stickiness_enabled" {
-  description = "(Optional) Whether to enable the type of stickiness associated with this target group. If enabled, the load balancer binds a client’s session to a specific instance within the target group. Defaults to `false`."
-  type        = bool
-  default     = false
-  nullable    = false
-}
-
-variable "stickiness_type" {
-  description = "(Optional) The type of sticky sessions. Valid values are `LB_COOKIE` or `APP_COOKIE`. Defaults to `LB_COOKIE`."
-  type        = string
-  default     = "LB_COOKIE"
-  nullable    = false
-
   validation {
-    condition     = contains(["LB_COOKIE", "APP_COOKIE"], var.stickiness_type)
-    error_message = "Valid values are `LB_COOKIE` or `APP_COOKIE`."
+    condition = anytrue([
+      var.load_balancing.slow_start_duration == 0,
+      var.load_balancing.slow_start_duration <= 900 && var.load_balancing.slow_start_duration >= 30
+    ])
+    error_message = "Valid value for `slow_start_duration` is 0 to disable, or from 30 to 900 to enable."
+  }
+  validation {
+    condition     = contains(["LB_COOKIE", "APP_COOKIE"], var.load_balancing.stickiness.type)
+    error_message = "Valid values for `stickiness.type` are `LB_COOKIE` or `APP_COOKIE`."
+  }
+  validation {
+    condition = alltrue([
+      var.load_balancing.stickiness.duration >= 1,
+      var.load_balancing.stickiness.duration <= 604800,
+    ])
+    error_message = "Valid values for `stickiness.duration` are from `1` to `604800` (1 week)."
+  }
+  validation {
+    condition = anytrue([
+      var.load_balancing.stickiness.type != "APP_COOKIE",
+      length(var.load_balancing.stickiness.cookie) > 0 && !can(regex("^(AWSALB|AWSALBAPP|AWSALBTG)", var.load_balancing.stickiness.cookie))
+    ])
+    error_message = "The `cookie` attribute is only needed when `stickiness.type` is `APP_COOKIE`, and the name of the application based cookie cannot start with `AWSALB`, `AWSALBAPP`, or `AWSALBTG`."
   }
 }
 
-variable "stickiness_duration" {
-  description = "(Optional) The time period, in seconds, during which requests from a client should be routed to the same target. After this time period expires, the load balancer-generated cookie is considered stale. Valid values are from `1` to `604800` (1 week). Defaults to `86400` (1 day)."
-  type        = number
-  default     = 86400
-  nullable    = false
+variable "dns_failover_condition" {
+  description = <<EOF
+  (Optional) A configuration for the DNS Failover requirements. The minimum healthy targets required to maintain the load balancer's zonal IP addresses in the DNS record, allowing for new client connections. If this requirement is not met, DNS failover is initiated. This means that the load balancer's zonal IP address is removed from the DNS record preventing the load balancer from sending new client connections to unhealthy zones. `dns_failover_condition` as defined below.
+    (Optional) `min_healthy_targets` - A minimum condition for the number or percentage of healthy targets in a target group. To count as healthy, a target must pass health checks and not be part of an active zonal shift. `min_healthy_targets` as defined below.
+      (Optional) `count` - The minimum number of targets that must be healthy. If the number of healthy targets is below this value, mark the zone as unhealthy in DNS, so that traffic is routed only to healthy zones. Valid values are from `0` (Disabled) to the total number of targets in the target group. Defaults to `1`.
+      (Optional) `percentage` - The minimum percentage of targets that must be healthy. If the percentage of healthy targets is below this value, mark the zone as unhealthy in DNS, so that traffic is routed only to healthy zones. Valid values are from `0` to `100`. Defaults to `0` (Disabled).
+  EOF
+  type = object({
+    min_healthy_targets = optional(object({
+      count      = optional(number, 1)
+      percentage = optional(number, 0)
+    }), {})
+  })
+  default  = {}
+  nullable = false
 
   validation {
     condition = alltrue([
-      var.stickiness_duration >= 1,
-      var.stickiness_duration <= 604800,
+      var.dns_failover_condition.min_healthy_targets.count >= 0,
+      var.dns_failover_condition.min_healthy_targets.count <= 1000,
     ])
-    error_message = "Valid values are from `1` to `604800` (1 week)."
+    error_message = "Valid values for `dns_failover_condition.min_healthy_targets.count` are from `0` to `1000`."
+  }
+  validation {
+    condition = alltrue([
+      var.dns_failover_condition.min_healthy_targets.percentage >= 0,
+      var.dns_failover_condition.min_healthy_targets.percentage <= 100,
+    ])
+    error_message = "Valid values for `dns_failover_condition.min_healthy_targets.percentage` are from `0` to `100`."
   }
 }
 
-variable "stickiness_cookie" {
-  description = "(Optional) The name of the application based cookie. `AWSALB`, `AWSALBAPP`, and `AWSALBTG` prefixes are reserved and cannot be used. Only needed when `stickiness_type` is `APP_COOKIE`."
-  type        = string
-  default     = null
+variable "unhealthy_state_routing_condition" {
+  description = <<EOF
+  (Optional) A configuration for unhealthy state routing requirements. The minimum healthy targets required to deliver your service. If either the count or percentage value requirement is not met, then the unhealthy state routing action is taken. When this happens, the load balancer should fail open, sending traffic to all targets (including unhealthy targets). `unhealthy_state_routing_condition` as defined below.
+    (Optional) `min_healthy_targets` - A minimum condition for the number or percentage of healthy targets in a target group. To count as healthy, a target must pass health checks and not be part of an active zonal shift. `min_healthy_targets` as defined below.
+      (Optional) `count` -  The minimum number of targets that must be healthy. If the number of healthy targets is below this value, send traffic to all targets, including unhealthy targets. Valid values are from `1` to the total number of targets in the target group. Defaults to `1`.
+      (Optional) `percentage` - The minimum percentage of targets that must be healthy. If the percentage of healthy targets is below this value, send traffic to all targets, including unhealthy targets. Valid values are from `0` to `100`. Defaults to `0` (Disabled).
+  EOF
+  type = object({
+    min_healthy_targets = optional(object({
+      count      = optional(number, 1)
+      percentage = optional(number, 0)
+    }), {})
+  })
+  default  = {}
+  nullable = false
+
+  validation {
+    condition = alltrue([
+      var.unhealthy_state_routing_condition.min_healthy_targets.count >= 1,
+      var.unhealthy_state_routing_condition.min_healthy_targets.count <= 1000,
+    ])
+    error_message = "Valid values for `unhealthy_state_routing_condition.min_healthy_targets.count` are from `1` to `1000`."
+  }
+  validation {
+    condition = alltrue([
+      var.unhealthy_state_routing_condition.min_healthy_targets.percentage >= 0,
+      var.unhealthy_state_routing_condition.min_healthy_targets.percentage <= 100,
+    ])
+    error_message = "Valid values for `unhealthy_state_routing_condition.min_healthy_targets.percentage` are from `0` to `100`."
+  }
+  validation {
+    condition = alltrue([
+      var.dns_failover_condition.min_healthy_targets.count >= var.unhealthy_state_routing_condition.min_healthy_targets.count,
+      var.dns_failover_condition.min_healthy_targets.percentage >= var.unhealthy_state_routing_condition.min_healthy_targets.percentage,
+    ])
+    error_message = "The `unhealthy_state_routing_condition` requirements should be less than or equal to the `dns_failover_condition` requirements."
+  }
+}
+
+variable "target_optimizer" {
+  description = <<EOF
+  (Optional) A configuration for the target optimizer feature of the target group. Use a target control port when the target has a strict concurrency limit. `target_optimizer` block as defined below.
+    (Optional) `target_control_port` - The port on which the target control agent and application load balancer exchange management traffic for the target optimizer feature. Only valid for ALB instance/ip target groups.
+  EOF
+  type = object({
+    target_control_port = optional(number)
+  })
+  default  = {}
+  nullable = false
 }
 
 variable "health_check" {
   description = <<EOF
-  (Optional) Health Check configuration block. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.
+  (Optional) A configurations for Health Check of the target group. The associated load balancer periodically sends requests to the registered targets to test their status. `health_check` block as defined below.
     (Optional) `protocol` - Protocol to use to connect with the target. The possible values are `HTTP` and `HTTPS`. Defaults to `HTTP`.
     (Optional) `port` - The port the load balancer uses when performing health checks on targets. The default is the port on which each target receives traffic from the load balancer. Valid values are either ports 1-65535.
-    (Optional) `port_override` - Whether to override the port on which each target receives trafficfrom the load balancer to a different port. Defaults to `false`.
-    (Optional) `path` - Use the default path of `/` to ping the root, or specify a custom path if preferred.
+    (Optional) `port_override` - Whether to override the port on which each target receives traffic from the load balancer to a different port. Defaults to `false`.
+    (Optional) `path` - The ping path for the HTTP or HTTPS protocol. Defaults to `/` if the protocol version is `HTTP1` or `HTTP2`, and `/AWS.ALB/healthcheck` if the protocol version is `GRPC`. A path can have a maximum of 1024 characters.
     (Optional) `success_codes` - The HTTP codes to use when checking for a successful response from a target. You can specify multiple values (for example, `200,202`) or a range of values (for example, `200-299`).
     (Optional) `healthy_threshold` - The number of consecutive health checks successes required before considering an unhealthy target healthy. Valid value range is 2 - 10. Defaults to `5`.
     (Optional) `unhealthy_threshold` - The number of consecutive health check failures required before considering a target unhealthy. Valid value range is 2 - 10. Defaults to `2`.
@@ -192,10 +272,10 @@ variable "health_check" {
   EOF
   type = object({
     protocol      = optional(string, "HTTP")
-    port          = optional(number, null)
+    port          = optional(number)
     port_override = optional(bool, false)
-    path          = optional(string, null)
-    success_codes = optional(string, null)
+    path          = optional(string, "")
+    success_codes = optional(string)
 
     healthy_threshold   = optional(number, 5)
     unhealthy_threshold = optional(number, 2)
@@ -206,21 +286,50 @@ variable "health_check" {
   nullable = false
 
   validation {
+    condition     = contains(["HTTP", "HTTPS"], var.health_check.protocol)
+    error_message = "Valid values for `protocol` are `HTTP` and `HTTPS`."
+  }
+  validation {
+    condition = anytrue([
+      var.health_check.port == null,
+      var.health_check.port != null && (
+        var.health_check.port >= 1 &&
+        var.health_check.port <= 65535
+      ),
+    ])
+    error_message = "Valid values for `port` are either ports 1-65535."
+  }
+  validation {
+    condition     = length(var.health_check.path) <= 1024
+    error_message = "A path can have a maximum of 1024 characters."
+  }
+  validation {
     condition = alltrue([
-      contains(["HTTP", "HTTPS"], var.health_check.protocol),
-      coalesce(var.health_check.port, 80) >= 1,
-      coalesce(var.health_check.port, 80) <= 65535,
-      length(var.health_check.path) <= 1024,
-      var.health_check.healthy_threshold <= 10,
       var.health_check.healthy_threshold >= 2,
-      var.health_check.unhealthy_threshold <= 10,
+      var.health_check.healthy_threshold <= 10,
+    ])
+    error_message = "Valid value range for `healthy_threshold` is 2 - 10."
+  }
+  validation {
+    condition = alltrue([
       var.health_check.unhealthy_threshold >= 2,
+      var.health_check.unhealthy_threshold <= 10,
+    ])
+    error_message = "Valid value range for `unhealthy_threshold` is 2 - 10."
+  }
+  validation {
+    condition = alltrue([
       var.health_check.interval >= 5,
       var.health_check.interval <= 300,
+    ])
+    error_message = "Valid value range for `interval` is 5 - 300."
+  }
+  validation {
+    condition = alltrue([
       var.health_check.timeout >= 2,
       var.health_check.timeout <= 120,
     ])
-    error_message = "Not valid parameters for `health_check`."
+    error_message = "Valid value range for `timeout` is 2 - 120."
   }
 }
 
@@ -242,9 +351,6 @@ variable "module_tags_enabled" {
 ###################################################
 # Resource Group
 ###################################################
-
-
-
 
 variable "resource_group" {
   description = <<EOF
