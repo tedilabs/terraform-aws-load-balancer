@@ -196,4 +196,6 @@ resource "aws_lb_target_group_attachment" "this" {
   target_id         = each.key
   port              = each.value.port
   availability_zone = each.value.az
+
+  quic_server_id = each.value.quic_server
 }
