@@ -49,7 +49,7 @@ variable "port" {
 }
 
 variable "protocol" {
-  description = "(Required) The protocol to use for routing traffic to the targets. Valid values are `HTTP` and `HTTPS`. Defaults to `HTTP`."
+  description = "(Required) The protocol to use for routing traffic to the targets. Valid values are `HTTP` and `HTTPS`."
   type        = string
   nullable    = false
 
@@ -86,7 +86,7 @@ variable "targets" {
 }
 
 variable "deregistration_delay" {
-  description = "(Optional) The time to wait for in-flight requests to complete while deregistering a target. During this time, the state of the target is draining."
+  description = "(Optional) The time to wait for in-flight requests to complete while deregistering a target. During this time, the state of the target is draining. Valid values are from `0` to `3600` seconds. Defaults to `300` seconds."
   type        = number
   default     = 300
   nullable    = false
