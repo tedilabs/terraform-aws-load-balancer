@@ -33,6 +33,11 @@ output "vpc_id" {
   value       = aws_lb_target_group.this.vpc_id
 }
 
+output "ip_address_type" {
+  description = "The type of IP addresses used by the target group."
+  value       = upper(aws_lb_target_group.this.ip_address_type)
+}
+
 output "type" {
   description = "The target type of the target group."
   value       = upper(aws_lb_target_group.this.target_type)
@@ -61,16 +66,51 @@ output "targets" {
 output "attributes" {
   description = "Attributes of the Instance target group of network load balancer."
   value = {
-    terminate_connection_on_deregistration = aws_lb_target_group.this.connection_termination
-    deregistration_delay                   = aws_lb_target_group.this.deregistration_delay
+    on_deregistration = {
+      connection_termination_enabled = aws_lb_target_group.this.connection_termination
+      draining_interval              = tonumber(aws_lb_target_group.this.deregistration_delay)
+    }
+    on_unhealthy = {
+      connection_termination_enabled = aws_lb_target_group.this.target_health_state[0].enable_unhealthy_connection_termination
+      draining_interval              = tonumber(aws_lb_target_group.this.target_health_state[0].unhealthy_draining_interval)
+    }
     load_balancing = {
       cross_zone_strategy = var.load_balancing.cross_zone_strategy
+      stickiness = {
+        enabled = aws_lb_target_group.this.stickiness[0].enabled
+        type    = upper(aws_lb_target_group.this.stickiness[0].type)
+      }
     }
     preserve_client_ip = aws_lb_target_group.this.preserve_client_ip
     proxy_protocol_v2  = aws_lb_target_group.this.proxy_protocol_v2
-    stickiness = {
-      enabled = aws_lb_target_group.this.stickiness[0].enabled
-      type    = upper(aws_lb_target_group.this.stickiness[0].type)
+  }
+}
+
+output "dns_failover_condition" {
+  description = "The configuration for DNS failover requirements."
+  value = {
+    min_healthy_targets = {
+      count = (aws_lb_target_group.this.target_group_health[0].dns_failover[0].minimum_healthy_targets_count != "off"
+        ? tonumber(aws_lb_target_group.this.target_group_health[0].dns_failover[0].minimum_healthy_targets_count)
+        : 0
+      )
+      percentage = (aws_lb_target_group.this.target_group_health[0].dns_failover[0].minimum_healthy_targets_percentage != "off"
+        ? tonumber(aws_lb_target_group.this.target_group_health[0].dns_failover[0].minimum_healthy_targets_percentage)
+        : 0
+      )
+    }
+  }
+}
+
+output "unhealthy_state_routing_condition" {
+  description = "The configuration for unhealthy state routing requirements."
+  value = {
+    min_healthy_targets = {
+      count = tonumber(aws_lb_target_group.this.target_group_health[0].unhealthy_state_routing[0].minimum_healthy_targets_count)
+      percentage = (aws_lb_target_group.this.target_group_health[0].unhealthy_state_routing[0].minimum_healthy_targets_percentage != "off"
+        ? tonumber(aws_lb_target_group.this.target_group_health[0].unhealthy_state_routing[0].minimum_healthy_targets_percentage)
+        : 0
+      )
     }
   }
 }
@@ -105,3 +145,20 @@ output "resource_group" {
     )
   )
 }
+
+# output "debug" {
+#   value = {
+#     target_group = {
+#       for k, v in aws_lb_target_group.this :
+#       k => v
+#       if !contains(["id", "arn", "arn_suffix", "name", "tags", "tags_all", "lambda_multi_value_headers_enabled", "target_type", "vpc_id", "port", "protocol", "health_check", "target_group_health", "target_failover", "ip_address_type", "load_balancer_arns", "region", "protocol_version", "name_prefix", "preserve_client_ip", "target_control_port", "load_balancing_algorithm_type", "load_balancing_anomaly_mitigation", "proxy_protocol_v2", "slow_start", "stickiness", "load_balancing_cross_zone_enabled", "deregistration_delay", "connection_termination", "target_health_state"], k)
+#     }
+#     targets = [
+#       for target in aws_lb_target_group_attachment.this : {
+#         for k, v in target :
+#         k => v
+#         if !contains(["region", "target_group_arn", "target_id", "port"], k)
+#       }
+#     ]
+#   }
+# }
