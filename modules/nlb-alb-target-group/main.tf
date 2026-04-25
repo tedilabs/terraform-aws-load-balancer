@@ -21,14 +21,21 @@ locals {
 
 # INFO: Not supported attributes
 # - `connection_termination`
+# - `deregistration_delay` (fixed to `300` by AWS)
 # - `ip_address_type`
 # - `lambda_multi_value_headers_enabled`
 # - `load_balancing_algorithm_type`
 # - `load_balancing_anomaly_mitigation`
-# - `load_balancing_cross_zone_enabled`
+# - `load_balancing_cross_zone_enabled` (fixed to `INHERIT` by AWS)
+# - `preserve_client_ip` (fixed to `true` by AWS)
 # - `protocol_version`
 # - `proxy_protocol_v2`
 # - `slow_start`
+# - `stickiness` (fixed to disabled `source_ip` by AWS)
+# - `target_control_port`
+# - `target_failover`
+# - `target_group_health`
+# - `target_health_state`
 resource "aws_lb_target_group" "this" {
   region = var.region
 
@@ -40,17 +47,8 @@ resource "aws_lb_target_group" "this" {
   port        = var.port
   protocol    = "TCP"
 
-  ## Attributes
-  ## INFO: Not supported to edit
-  # deregistration_delay = 300
-  # preserve_client_ip = true
-  # stickiness {
-  #   enabled = false
-  #   type    = "source_ip"
-  # }
 
-  ## INFO: Not supported attributes
-  # - `timeout`
+  ## Health Check
   health_check {
     enabled = true
 
@@ -60,12 +58,17 @@ resource "aws_lb_target_group" "this" {
       : "traffic-port"
     )
     path    = var.health_check.path
-    matcher = "200-399"
+    matcher = var.health_check.success_codes
 
     healthy_threshold   = var.health_check.healthy_threshold
     unhealthy_threshold = var.health_check.unhealthy_threshold
     interval            = var.health_check.interval
+    timeout = (var.health_check.protocol == "HTTP"
+      ? coalesce(var.health_check.timeout, 6)
+      : coalesce(var.health_check.timeout, 10)
+    )
   }
+
 
   tags = merge(
     {
