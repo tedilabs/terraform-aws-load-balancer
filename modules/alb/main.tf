@@ -146,17 +146,47 @@ module "listener" {
   port     = each.key
   protocol = each.value.protocol
 
-  default_action_type       = each.value.default_action_type
-  default_action_parameters = each.value.default_action_parameters
-
-  rules = try(each.value.rules, {})
 
   ## TLS
   tls = {
-    certificate             = try(each.value.tls.certificate, null)
-    additional_certificates = try(each.value.tls.additional_certificates, [])
-    security_policy         = try(each.value.tls.security_policy, "ELBSecurityPolicy-2016-08")
+    certificate             = each.value.tls.certificate
+    additional_certificates = each.value.tls.additional_certificates
+    security_policy         = each.value.tls.security_policy
   }
+  mtls = {
+    mode                             = each.value.mtls.mode
+    trust_store                      = each.value.mtls.trust_store
+    ignore_client_certificate_expiry = each.value.mtls.ignore_client_certificate_expiry
+    advertise_trust_store_ca_names   = each.value.mtls.advertise_trust_store_ca_names
+  }
+
+
+  ## Actions
+  default_action_type       = each.value.default_action_type
+  default_action_parameters = each.value.default_action_parameters
+
+  rules = each.value.rules
+
+
+  ## Attributes
+  overwrite_response_headers = {
+    strict_transport_security = each.value.overwrite_response_headers.strict_transport_security
+    content_security_policy   = each.value.overwrite_response_headers.content_security_policy
+    x_content_type_options    = each.value.overwrite_response_headers.x_content_type_options
+    x_frame_options           = each.value.overwrite_response_headers.x_frame_options
+    cors = {
+      allow_origin      = each.value.overwrite_response_headers.cors.allow_origin
+      allow_methods     = each.value.overwrite_response_headers.cors.allow_methods
+      allow_headers     = each.value.overwrite_response_headers.cors.allow_headers
+      allow_credentials = each.value.overwrite_response_headers.cors.allow_credentials
+      expose_headers    = each.value.overwrite_response_headers.cors.expose_headers
+      max_age           = each.value.overwrite_response_headers.cors.max_age
+    }
+  }
+  server_response_header_enabled = each.value.server_response_header_enabled
+  rename_mtls_request_headers    = each.value.rename_mtls_request_headers
+  rename_tls_request_headers     = each.value.rename_tls_request_headers
+
 
   resource_group = {
     enabled = false

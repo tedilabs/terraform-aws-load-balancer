@@ -261,27 +261,87 @@ variable "listeners" {
   (Optional) A list of listener configurations of the application load balancer. Listeners listen for connection requests using their `protocol` and `port`. Each value of `listener` block as defined below.
     (Required) `port` - The number of port on which the listener of load balancer is listening.
     (Required) `protocol` - The protocol for connections from clients to the load balancer. Valid values are `HTTP` and `HTTPS`.
-    (Required) `default_action_type` - The type of default routing action. Valid values are `FORWARD`, `FIXED_RESPONSE`, `REDIRECT_301` and `REDIRECT_302`.
-    (Optional) `default_action_parameters` - Configuration block for the parameters of the default routing action.
-    (Optional) `rules` - The rules that you define for the listener determine how the load balancer routes requests to the targets in one or more target groups.
-    (Optional) The configuration for TLS listener of the load balancer. Required if `protocol` is `HTTPS`. `tls` block as defined below.
+    (Optional) `tls` - The configuration for TLS listener of the load balancer. Required if `protocol` is `HTTPS`. `tls` block as defined below.
       (Optional) `certificate` - The ARN of the default SSL server certificate. For adding additional SSL certificates, see the `additional_certificates` variable.
       (Optional) `additional_certificates` - A set of ARNs of the certificate to attach to the listener. This is for additional certificates and does not replace the default certificate on the listener.
-      (Optional) `security_policy` - The name of security policy for a Secure Socket Layer (SSL) negotiation configuration. This is used to negotiate SSL connections with clients. Required if protocol is `HTTPS`. Defaults to `ELBSecurityPolicy-2016-08` security policy. The `ELBSecurityPolicy-2016-08` security policy is always used for backend connections. Application Load Balancers do not support custom security policies.
+      (Optional) `security_policy` - The name of security policy for a Secure Socket Layer (SSL) negotiation configuration. This is used to negotiate SSL connections with clients. Required if protocol is `HTTPS`. Defaults to `ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09` security policy.
+    (Optional) `mtls` - A configuration for mutual TLS authentication on the listener. Only valid when `protocol` is `HTTPS`. `mtls` as defined below.
+      (Required) `mode` - The mTLS verification mode. Valid values are `OFF`, `PASSTHROUGH`, `VERIFY`.
+      (Optional) `trust_store` - The ARN of the Trust Store. Required when `mode` is `VERIFY`.
+      (Optional) `ignore_client_certificate_expiry` - Whether client certificate expiry is ignored. Defaults to `false`. **Warning:** Setting this to `true` allows expired client certificates and weakens security guarantees. Use only when temporarily tolerating expired certificates during rotation.
+      (Optional) `advertise_trust_store_ca_names` - Whether trust-store CA certificate names are advertised. Defaults to `false`.
+    (Required) `default_action_type` - The type of default routing action. Valid values are `FORWARD`, `WEIGHTED_FORWARD`, `FIXED_RESPONSE`, `REDIRECT_301` and `REDIRECT_302`.
+    (Optional) `default_action_parameters` - Configuration block for the parameters of the default routing action.
+    (Optional) `rules` - The rules that you define for the listener determine how the load balancer routes requests to the targets in one or more target groups.
+    (Optional) `overwrite_response_headers` - A configuration to overwrite response headers on the listener. Valid for both `HTTP` and `HTTPS` protocol. If the HTTP response from your load balancer's target already includes a header, the load balancer will overwrite it with the configured value. `overwrite_response_headers` as defined below.
+      (Optional) `strict_transport_security` - Value for the `Strict-Transport-Security` response header. Informs browsers that the site should only be accessed using HTTPS, and that any future attempts to access it using HTTP should automatically be converted to HTTPS.
+      (Optional) `content_security_policy` - Value for the `Content-Security-Policy` response header. Specify restrictions enforced by the browser to help minimize the risk of certain types of security threats.
+      (Optional) `x_content_type_options` - Value for the `X-Content-Type-Options` response header. Indicates whether the MIME types advertised in the `Content-Type` headers should be followed and not be changed. Valid value is `nosniff`.
+      (Optional) `x_frame_options` - Value for the `X-Frame-Options` response header. Indicates whether the browser is allowed to render a page in a frame, iframe, embed or object. Valid values are `DENY`, `SAMEORIGIN`.
+      (Optional) `cors` - Cross-origin resource sharing headers. `cors` as defined below.
+        (Optional) `allow_origin` - Value for the `Access-Control-Allow-Origin` response header. Specifies which origins are allowed to access the server.
+        (Optional) `allow_methods` - Value for the `Access-Control-Allow-Methods` response header. Specifies which HTTP methods are allowed when accessing the server from a different origin.
+        (Optional) `allow_headers` - Value for the `Access-Control-Allow-Headers` response header. Specifies which headers can be used during the request.
+        (Optional) `allow_credentials` - Value for the `Access-Control-Allow-Credentials` response header. Indicates whether the browser should include credentials such as cookies or authentication when making requests. Only valid value is the literal string `true`.
+        (Optional) `expose_headers` - Value for the `Access-Control-Expose-Headers` response header. Indicates which headers the browser can expose to the requesting client.
+        (Optional) `max_age` - Value (in seconds, as a string) for the `Access-Control-Max-Age` response header. Specify how long the results of a preflight request can be cached, in seconds.
+    (Optional) `server_response_header_enabled` - Whether to include the `Server` HTTP response header with value `awselb/2.0`. If the HTTP response from your load balancer's target already includes a header, the load balancer will not modify or remove it, regardless of these configurations. Defaults to `false`.
+    (Optional) `rename_mtls_request_headers` - A map to rename the mutual TLS client-certificate request headers that the load balancer forwards to targets. Only valid when `protocol` is `HTTPS` and `mtls.mode` is `PASSTHROUGH` or `VERIFY`. Each key is the original AWS mTLS header name (case-sensitive), and each value is the renamed header name. Supported keys are `X-Amzn-Mtls-Clientcert`, `X-Amzn-Mtls-Clientcert-Serial-Number`, `X-Amzn-Mtls-Clientcert-Issuer`, `X-Amzn-Mtls-Clientcert-Subject`, `X-Amzn-Mtls-Clientcert-Validity`, and `X-Amzn-Mtls-Clientcert-Leaf`. Headers not specified keep their default name.
+    (Optional) `rename_tls_request_headers` - A map to rename the TLS context request headers that the load balancer forwards to targets. Only valid when `protocol` is `HTTPS`. Each key is the original AWS TLS header name (case-sensitive), and each value is the renamed header name. Supported keys are `X-Amzn-Tls-Version` and `X-Amzn-Tls-Cipher-Suite`. Headers not specified keep their default name.
   EOF
-  type        = any
-  # type = list(object({
-  #   port                      = number
-  #   protocol                  = string
-  #   default_action_type       = string
-  #   default_action_parameters = optional(any, {})
-  #   rules                     = optional(any, {})
-  #   tls = optional(object({
-  #     certificate             = optional(string)
-  #     additional_certificates = optional(set(string), [])
-  #     security_policy         = optional(string, "ELBSecurityPolicy-2016-08")
-  #   }), {})
-  # }))
+  type = list(object({
+    port     = number
+    protocol = string
+    tls = optional(object({
+      certificate             = optional(string)
+      additional_certificates = optional(set(string), [])
+      security_policy         = optional(string, "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09")
+    }), {})
+    mtls = optional(object({
+      mode                             = optional(string, "OFF")
+      trust_store                      = optional(string)
+      ignore_client_certificate_expiry = optional(bool, false)
+      advertise_trust_store_ca_names   = optional(bool, false)
+    }), {})
+    default_action_type = string
+    default_action_parameters = optional(object({
+      status_code  = optional(number, 503)
+      content_type = optional(string, "text/plain")
+      data         = optional(string, "")
+
+      protocol = optional(string, "#{protocol}")
+      host     = optional(string, "#{host}")
+      port     = optional(string, "#{port}")
+      path     = optional(string, "/#{path}")
+      query    = optional(string, "#{query}")
+
+      target_group = optional(string)
+
+      targets = optional(list(object({
+        target_group = string
+        weight       = optional(number, 1)
+      })), [])
+      stickiness_duration = optional(number, 0)
+    }), {})
+    rules = optional(any, {})
+    overwrite_response_headers = optional(object({
+      strict_transport_security = optional(string)
+      content_security_policy   = optional(string)
+      x_content_type_options    = optional(string)
+      x_frame_options           = optional(string)
+      cors = optional(object({
+        allow_origin      = optional(string)
+        allow_methods     = optional(string)
+        allow_headers     = optional(string)
+        allow_credentials = optional(string)
+        expose_headers    = optional(string)
+        max_age           = optional(string)
+      }), {})
+    }), {})
+    server_response_header_enabled = optional(bool, false)
+    rename_mtls_request_headers    = optional(map(string), {})
+    rename_tls_request_headers     = optional(map(string), {})
+  }))
   default  = []
   nullable = false
 }
@@ -315,9 +375,6 @@ variable "module_tags_enabled" {
 ###################################################
 # Resource Group
 ###################################################
-
-
-
 
 variable "resource_group" {
   description = <<EOF
