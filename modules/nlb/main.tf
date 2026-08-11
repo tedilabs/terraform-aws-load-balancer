@@ -166,9 +166,8 @@ module "listener" {
 
   load_balancer = aws_lb.this.arn
 
-  port         = each.key
-  protocol     = each.value.protocol
-  target_group = each.value.target_group
+  port     = each.key
+  protocol = each.value.protocol
 
   ## TLS
   tls = {
@@ -176,6 +175,12 @@ module "listener" {
     additional_certificates = each.value.tls.additional_certificates
     security_policy         = each.value.tls.security_policy
     alpn_policy             = each.value.tls.alpn_policy
+  }
+
+  ## Actions
+  default_action_type = "FORWARD"
+  default_action_parameters = {
+    target_group = each.value.target_group
   }
 
   resource_group = {

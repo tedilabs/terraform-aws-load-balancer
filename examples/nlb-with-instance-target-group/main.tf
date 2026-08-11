@@ -77,11 +77,17 @@ module "target_group" {
   protocol = "TCP"
 
   ## Attributes
-  terminate_connection_on_deregistration = false
-  deregistration_delay                   = 300
-  preserve_client_ip                     = true
-  proxy_protocol_v2                      = false
-  stickiness_enabled                     = true
+  on_deregistration = {
+    connection_termination_enabled = false
+    draining_interval              = 300
+  }
+  load_balancing = {
+    stickiness = {
+      enabled = true
+    }
+  }
+  preserve_client_ip = true
+  proxy_protocol_v2  = false
 
   targets = [
     # {

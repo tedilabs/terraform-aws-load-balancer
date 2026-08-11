@@ -147,13 +147,17 @@ module "target_group_alpha" {
   protocol_version = "HTTP1"
 
   ## Attributes
-  deregistration_delay     = 300
-  load_balancing_algorithm = "ROUND_ROBIN"
-  slow_start_duration      = 0
+  deregistration_delay = 300
+  load_balancing = {
+    algorithm           = "ROUND_ROBIN"
+    slow_start_duration = 0
 
-  stickiness_enabled  = true
-  stickiness_type     = "LB_COOKIE"
-  stickiness_duration = 86400
+    stickiness = {
+      enabled  = true
+      type     = "LB_COOKIE"
+      duration = 86400
+    }
+  }
 
   targets = [
     # {
@@ -192,14 +196,18 @@ module "target_group_beta" {
   protocol_version = "HTTP1"
 
   ## Attributes
-  deregistration_delay     = 300
-  load_balancing_algorithm = "ROUND_ROBIN"
-  slow_start_duration      = 0
+  deregistration_delay = 300
+  load_balancing = {
+    algorithm           = "ROUND_ROBIN"
+    slow_start_duration = 0
 
-  stickiness_enabled  = true
-  stickiness_type     = "APP_COOKIE"
-  stickiness_duration = 86400
-  stickiness_cookie   = "X-TEDILABS-SESSION"
+    stickiness = {
+      enabled  = true
+      type     = "APP_COOKIE"
+      duration = 86400
+      cookie   = "X-TEDILABS-SESSION"
+    }
+  }
 
   targets = [
     # {
