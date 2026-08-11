@@ -22,7 +22,7 @@ data "aws_subnet" "default" {
 module "nlb" {
   source = "../../modules/nlb"
   # source  = "tedilabs/load-balancer/aws//modules/nlb"
-  # version = "~> 1.0.0"
+  # version = "~> 1.5.0"
 
   name = "tedilabs-nlb-ip"
 
@@ -67,7 +67,7 @@ module "nlb" {
 module "target_group" {
   source = "../../modules/nlb-ip-target-group"
   # source  = "tedilabs/load-balancer/aws//modules/nlb-ip-target-group"
-  # version = "~> 1.0.0"
+  # version = "~> 1.5.0"
 
   name = "tedilabs-nlb-ip-tg"
 

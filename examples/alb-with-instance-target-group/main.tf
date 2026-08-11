@@ -22,7 +22,7 @@ data "aws_subnet" "default" {
 module "alb" {
   source = "../../modules/alb"
   # source  = "tedilabs/load-balancer/aws//modules/alb"
-  # version = "~> 1.0.0"
+  # version = "~> 1.5.0"
 
   name = "tedilabs-alb-instance"
 
@@ -136,7 +136,7 @@ module "alb" {
 module "target_group_alpha" {
   source = "../../modules/alb-instance-target-group"
   # source  = "tedilabs/load-balancer/aws//modules/alb-instance-target-group"
-  # version = "~> 1.0.0"
+  # version = "~> 1.5.0"
 
   name = "tedilabs-alb-instance-alpha-tg"
 
@@ -181,7 +181,7 @@ module "target_group_alpha" {
 module "target_group_beta" {
   source = "../../modules/alb-instance-target-group"
   # source  = "tedilabs/load-balancer/aws//modules/alb-instance-target-group"
-  # version = "~> 1.0.0"
+  # version = "~> 1.5.0"
 
   name = "tedilabs-alb-instance-beta-tg"
 

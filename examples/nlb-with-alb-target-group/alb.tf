@@ -5,7 +5,7 @@
 module "alb" {
   source = "../../modules/alb"
   # source  = "tedilabs/load-balancer/aws//modules/alb"
-  # version = "~> 1.0.0"
+  # version = "~> 1.5.0"
 
   name = "tedilabs-nlb-alb-alb"
 
