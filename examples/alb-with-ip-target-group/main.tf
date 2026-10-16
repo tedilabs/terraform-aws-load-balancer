@@ -50,8 +50,11 @@ module "alb" {
   drop_invalid_header_fields  = false
   deletion_protection_enabled = false
   http2_enabled               = true
-  waf_fail_open_enabled       = false
   idle_timeout                = 60
+
+  waf = {
+    fail_open_enabled = false
+  }
 
   listeners = [
     {

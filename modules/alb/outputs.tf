@@ -83,6 +83,14 @@ output "access_log" {
   value       = var.access_log
 }
 
+output "waf" {
+  description = "The WAF configuration for the load balancer."
+  value = {
+    web_acl           = one(aws_wafv2_web_acl_association.this[*].web_acl_arn)
+    fail_open_enabled = aws_lb.this.enable_waf_fail_open
+  }
+}
+
 output "attributes" {
   description = "Load Balancer Attributes that applied to the application load balancer."
   value = {
@@ -90,7 +98,6 @@ output "attributes" {
     desync_mitigation_mode            = upper(aws_lb.this.desync_mitigation_mode)
     deletion_protection_enabled       = aws_lb.this.enable_deletion_protection
     http2_enabled                     = aws_lb.this.enable_http2
-    waf_fail_open_enabled             = aws_lb.this.enable_waf_fail_open
     idle_timeout                      = aws_lb.this.idle_timeout
 
     tls_negotiation_headers_enabled = aws_lb.this.enable_tls_version_and_cipher_suite_headers
