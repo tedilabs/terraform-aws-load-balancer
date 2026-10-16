@@ -206,11 +206,18 @@ variable "http2_enabled" {
   nullable    = false
 }
 
-variable "waf_fail_open_enabled" {
-  description = "(Optional) Indicates whether to allow a WAF-enabled load balancer to route requests to targets if it is unable to forward the request to AWS WAF. Defaults to `false`."
-  type        = bool
-  default     = false
-  nullable    = false
+variable "waf" {
+  description = <<EOF
+  (Optional) The WAF configuration for the load balancer. `waf` as defined below.
+    (Optional) `web_acl` - The ARN of the regional WAFv2 Web ACL to associate with the load balancer. The Web ACL must be in the same region as the load balancer. If omitted, no association is managed.
+    (Optional) `fail_open_enabled` - Whether to allow the load balancer to route requests to targets if it is unable to forward the request to AWS WAF. Defaults to `false`.
+  EOF
+  type = object({
+    web_acl           = optional(string)
+    fail_open_enabled = optional(bool, false)
+  })
+  default  = {}
+  nullable = false
 }
 
 variable "idle_timeout" {

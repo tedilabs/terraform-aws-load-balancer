@@ -100,7 +100,7 @@ resource "aws_lb" "this" {
   enable_cross_zone_load_balancing = var.cross_zone_load_balancing_enabled
   enable_deletion_protection       = var.deletion_protection_enabled
   enable_http2                     = var.http2_enabled
-  enable_waf_fail_open             = var.waf_fail_open_enabled
+  enable_waf_fail_open             = var.waf.fail_open_enabled
   idle_timeout                     = var.idle_timeout
 
   # Headers

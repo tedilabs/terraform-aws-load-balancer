@@ -6,6 +6,20 @@ This module creates following resources.
 - `aws_lb_listener` (optional)
 - `aws_lb_listener_certificate` (optional)
 - `aws_lb_listener_rule` (optional)
+- `aws_wafv2_web_acl_association` (optional)
+
+## WAF
+
+Set `waf.web_acl` to the ARN of a regional WAFv2 Web ACL in the same region as the load balancer to manage its association. When omitted, the module creates no association. Removing a previously configured ARN destroys the association managed by this module.
+
+```hcl
+waf = {
+  web_acl           = "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/example/00000000-0000-0000-0000-000000000000"
+  fail_open_enabled = false
+}
+```
+
+The `waf_fail_open_enabled` input has moved to `waf.fail_open_enabled`. The `attributes.waf_fail_open_enabled` output has moved to `waf.fail_open_enabled`, and `waf.web_acl` returns the managed Web ACL ARN or `null` when no association is managed.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -35,6 +49,7 @@ This module creates following resources.
 | Name | Type |
 | ---- | ---- |
 | [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_wafv2_web_acl_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl_association) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_subnet.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 
@@ -65,7 +80,7 @@ This module creates following resources.
 | <a name="input_telemetry"></a> [telemetry](#input\_telemetry) | (Optional) A configuration to collect telemetry data for the module. This is used to improve the module and its features. To send pseudonyms instead of identifying values such as the hostname and the Git remote, set `pseudonymization_enabled` to `true`. Pseudonyms are not anonymous; to keep data from being sent, disable its collector. The default configuration enables telemetry collection for machine, network, git, github, github actions, HCP Terraform, terraform, and toolchain. You can disable telemetry collection by setting `enabled` to `false`. `telemetry` block as defined below.<br/>    (Optional) `enabled` - Whether to enable telemetry collection. Default is `true`.<br/>    (Optional) `capture_machine` - Whether to capture machine information. Default is `true`.<br/>    (Optional) `capture_network` - Whether to capture network information. Default is `true`.<br/>    (Optional) `capture_git` - Whether to capture git information. Default is `true`.<br/>    (Optional) `capture_github` - Whether to capture GitHub information. Default is `true`.<br/>    (Optional) `capture_github_actions` - Whether to capture GitHub Actions information. Default is `true`.<br/>    (Optional) `capture_hcp_terraform` - Whether to capture HCP Terraform information. Default is `true`.<br/>    (Optional) `capture_terraform` - Whether to capture Terraform information. Default is `true`.<br/>    (Optional) `capture_toolchain` - Whether to capture toolchain information. Default is `true`.<br/>    (Optional) `pseudonymization_enabled` - Whether to enable pseudonymization of the captured data. Default is `false`. | <pre>object({<br/>    enabled = optional(bool, true)<br/><br/>    capture_machine        = optional(bool, true)<br/>    capture_network        = optional(bool, true)<br/>    capture_git            = optional(bool, true)<br/>    capture_github         = optional(bool, true)<br/>    capture_github_actions = optional(bool, true)<br/>    capture_hcp_terraform  = optional(bool, true)<br/>    capture_terraform      = optional(bool, true)<br/>    capture_toolchain      = optional(bool, true)<br/><br/>    pseudonymization_enabled = optional(bool, false)<br/>  })</pre> | `{}` | no |
 | <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | (Optional) How long to wait for the load balancer to be created/updated/deleted. | <pre>object({<br/>    create = optional(string, "10m")<br/>    update = optional(string, "10m")<br/>    delete = optional(string, "10m")<br/>  })</pre> | `{}` | no |
 | <a name="input_tls_negotiation_headers_enabled"></a> [tls\_negotiation\_headers\_enabled](#input\_tls\_negotiation\_headers\_enabled) | (Optional) Whether the two TLS negotiation headers (`x-amzn-tls-version` and `x-amzn-tls-cipher-suite`), which contain information about the negotiated TLS version and cipher suite, are added to the client request before sending it to the target. Defaults to `false`. | `bool` | `false` | no |
-| <a name="input_waf_fail_open_enabled"></a> [waf\_fail\_open\_enabled](#input\_waf\_fail\_open\_enabled) | (Optional) Indicates whether to allow a WAF-enabled load balancer to route requests to targets if it is unable to forward the request to AWS WAF. Defaults to `false`. | `bool` | `false` | no |
+| <a name="input_waf"></a> [waf](#input\_waf) | (Optional) The WAF configuration for the load balancer. `waf` as defined below.<br/>    (Optional) `web_acl` - The ARN of the regional WAFv2 Web ACL to associate with the load balancer. The Web ACL must be in the same region as the load balancer. If omitted, no association is managed.<br/>    (Optional) `fail_open_enabled` - Whether to allow the load balancer to route requests to targets if it is unable to forward the request to AWS WAF. Defaults to `false`. | <pre>object({<br/>    web_acl           = optional(string)<br/>    fail_open_enabled = optional(bool, false)<br/>  })</pre> | `{}` | no |
 | <a name="input_xff_header"></a> [xff\_header](#input\_xff\_header) | (Optional) The configuration for . `xff_header` block as defined below.<br/>    (Optional) `mode` - How the load balancer modifies the `X-Forwarded-For` header in the HTTP request before sending the request to the target. Valid values are `APPEND`, `PRESERVE`, `REMOVE`. Defaults to `APPEND`.<br/>      `APPEND` - The load balancer appends the IP address of the client to the `X-Forwarded-For` header.<br/>      `PRESERVE` - The load balancer preserves the original IP address of the client.<br/>      `REMOVE` - The load balancer removes the `X-Forwarded-For` header from the request.<br/>    (Optional) `client_port_preservation_enabled` - Whether the `X-Forwarded-For` header should preserve the source port that the client used to connect to the load balancer. Defaults to `false`. | <pre>object({<br/>    mode                             = optional(string, "APPEND")<br/>    client_port_preservation_enabled = optional(bool, false)<br/>  })</pre> | `{}` | no |
 
 ## Outputs
@@ -91,5 +106,6 @@ This module creates following resources.
 | <a name="output_subnets"></a> [subnets](#output\_subnets) | A list of subnet IDs attached to the load balancer. |
 | <a name="output_type"></a> [type](#output\_type) | The type of the load balancer. Always return `APPLICATION`. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The VPC ID of the load balancer. |
+| <a name="output_waf"></a> [waf](#output\_waf) | The WAF configuration for the load balancer. |
 | <a name="output_zone_id"></a> [zone\_id](#output\_zone\_id) | The canonical hosted zone ID of the load balancer to be used in a Route 53 Alias record. |
 <!-- END_TF_DOCS -->
