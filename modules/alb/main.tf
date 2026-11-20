@@ -16,11 +16,15 @@ locals {
 
 
 data "aws_availability_zones" "available" {
+  region = var.region
+
   state = "available"
 }
 
 data "aws_subnet" "this" {
   for_each = var.network_mapping
+
+  region = var.region
 
   id = each.value.subnet
 }
