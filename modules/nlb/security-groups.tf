@@ -13,6 +13,8 @@ module "security_group" {
 
   count = var.default_security_group.enabled ? 1 : 0
 
+  region = var.region
+
   name        = coalesce(var.default_security_group.name, local.metadata.name)
   description = var.default_security_group.description
   vpc_id      = values(data.aws_subnet.this)[0].vpc_id
