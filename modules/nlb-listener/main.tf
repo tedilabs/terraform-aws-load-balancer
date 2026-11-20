@@ -76,9 +76,13 @@ resource "aws_lb_listener" "this" {
             weight = target.value.weight
           }
         }
-        stickiness {
-          enabled  = default_action.value.stickiness_duration > 0
-          duration = default_action.value.stickiness_duration
+        dynamic "stickiness" {
+          for_each = default_action.value.stickiness_duration > 0 ? ["go"] : []
+
+          content {
+            enabled  = true
+            duration = default_action.value.stickiness_duration
+          }
         }
       }
     }
