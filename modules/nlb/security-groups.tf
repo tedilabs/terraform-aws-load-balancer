@@ -54,7 +54,7 @@ module "security_group" {
         prefix_lists    = var.default_security_group.listener_ingress_prefix_lists
         security_groups = var.default_security_group.listener_ingress_security_groups
       }
-      if contains(["UDP"], listener.protocol) && anytrue([
+      if contains(["UDP", "TCP_UDP"], listener.protocol) && anytrue([
         length(var.default_security_group.listener_ingress_ipv4_cidrs) > 0,
         length(var.default_security_group.listener_ingress_ipv6_cidrs) > 0,
         length(var.default_security_group.listener_ingress_prefix_lists) > 0,
