@@ -89,8 +89,8 @@ output "default_action" {
           }
         ]
         stickiness = {
-          enabled  = element(aws_lb_listener.this.default_action, -1).forward[0].stickiness[0].enabled
-          duration = element(aws_lb_listener.this.default_action, -1).forward[0].stickiness[0].duration
+          enabled  = try(element(aws_lb_listener.this.default_action, -1).forward[0].stickiness[0].enabled, false)
+          duration = try(element(aws_lb_listener.this.default_action, -1).forward[0].stickiness[0].duration, 0)
         }
       }
       : null
