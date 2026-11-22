@@ -34,8 +34,9 @@ locals {
 
   targets = [
     for target in var.targets : {
-      ip_address = target.ip_address
-      port       = try(target.port, var.port)
+      ip_address  = target.ip_address
+      port        = try(target.port, var.port)
+      quic_server = target.quic_server
       az = anytrue([
         for cidr in(length(regexall(local.ipv4_regex, target.ip_address)) > 0 ? local.ipv4_vpc_cidrs : local.ipv6_vpc_cidrs) :
         cidr == cidrsubnet(format("%s/%s", target.ip_address, split("/", cidr)[1]), 0, 0)
