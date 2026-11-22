@@ -27,19 +27,21 @@ locals {
     "INHERIT"  = "use_load_balancer_configuration"
   }
 
-  ipv4_regex = "^(\\d+).(\\d+).(\\d+).(\\d+)$"
-
-  ipv4_vpc_cidrs = data.aws_vpc.this.cidr_block_associations[*].cidr_block
-  ipv6_vpc_cidrs = [data.aws_vpc.this.ipv6_cidr_block]
+  vpc_cidrs = {
+    ipv4 = data.aws_vpc.this.cidr_block_associations[*].cidr_block
+    ipv6 = compact([data.aws_vpc.this.ipv6_cidr_block])
+  }
 
   targets = [
     for target in var.targets : {
       ip_address  = target.ip_address
-      port        = try(target.port, var.port)
+      port        = coalesce(target.port, var.port)
       quic_server = target.quic_server
+
+      # INFO: Targets outside the VPC must be registered with `availability_zone = "all"`.
       az = anytrue([
-        for cidr in(length(regexall(local.ipv4_regex, target.ip_address)) > 0 ? local.ipv4_vpc_cidrs : local.ipv6_vpc_cidrs) :
-        cidr == cidrsubnet(format("%s/%s", target.ip_address, split("/", cidr)[1]), 0, 0)
+        for cidr in local.vpc_cidrs[strcontains(target.ip_address, ":") ? "ipv6" : "ipv4"] :
+        cidrhost(cidr, 0) == cidrhost("${target.ip_address}/${split("/", cidr)[1]}", 0)
       ]) ? null : "all"
     }
   ]
