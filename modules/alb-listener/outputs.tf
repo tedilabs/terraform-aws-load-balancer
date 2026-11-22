@@ -171,8 +171,8 @@ output "rules" {
               }
             ]
             stickiness = {
-              enabled  = rule.action.forward.stickiness[0].enabled
-              duration = rule.action.forward.stickiness[0].duration
+              enabled  = try(rule.action.forward.stickiness[0].enabled, false)
+              duration = try(rule.action.forward.stickiness[0].duration, 0)
             }
           }
           : null
