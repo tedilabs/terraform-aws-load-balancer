@@ -44,7 +44,7 @@ output "ip_address_type" {
 }
 
 output "port" {
-  description = "The port number on which the target receive trrafic."
+  description = "The port number on which targets receive traffic."
   value       = aws_lb_target_group.this.port
 }
 

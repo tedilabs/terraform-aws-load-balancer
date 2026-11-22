@@ -59,7 +59,7 @@ This module creates following resources.
 | <a name="output_id"></a> [id](#output\_id) | The ID of the target group. |
 | <a name="output_load_balancers"></a> [load\_balancers](#output\_load\_balancers) | The ARNs (Amazon Resource Name) of the load balancers associated with the target group. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |
-| <a name="output_port"></a> [port](#output\_port) | The port number on which the target receive trrafic. |
+| <a name="output_port"></a> [port](#output\_port) | The port number on which targets receive traffic. |
 | <a name="output_protocol"></a> [protocol](#output\_protocol) | The protocol to use to connect with the target. |
 | <a name="output_region"></a> [region](#output\_region) | The AWS region this module resources resides in. |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | The resource group created to manage resources in this module. |
