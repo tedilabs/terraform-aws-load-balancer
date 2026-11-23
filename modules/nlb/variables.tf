@@ -204,7 +204,7 @@ variable "listeners" {
   description = <<EOF
   (Optional) A list of listener configurations of the network load balancer. Listeners listen for connection requests using their `protocol` and `port`. Each value of `listener` block as defined below.
     (Required) `port` - The number of port on which the listener of load balancer is listening.
-    (Required) `protocol` - The protocol for connections from clients to the load balancer. Valid values are `TCP`, `TLS`, `UDP` and `TCP_UDP`. Not valid to use `UDP` or `TCP_UDP` if dual-stack mode is enabled on the load balancer.
+    (Required) `protocol` - The protocol for connections from clients to the load balancer. Valid values are `TCP`, `TLS`, `UDP`, `TCP_UDP`, `QUIC` and `TCP_QUIC`. Not valid to use `UDP` or `TCP_UDP` if dual-stack mode is enabled on the load balancer. Not valid to use `QUIC` or `TCP_QUIC` if security groups are configured or dual-stack mode is enabled.
     (Required) `target_group` - The ARN of the target group to which to route traffic.
     (Optional) `tls` - The configuration for TLS listener of the load balancer. Required if `protocol` is `TLS`. `tls` block as defined below.
       (Optional) `certificate` - The ARN of the default SSL server certificate. For adding additional SSL certificates, see the `additional_certificates` variable.
