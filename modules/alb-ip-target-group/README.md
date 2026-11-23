@@ -70,7 +70,7 @@ This module creates following resources.
 | <a name="output_ip_address_type"></a> [ip\_address\_type](#output\_ip\_address\_type) | The type of IP addresses used by the target group. |
 | <a name="output_load_balancers"></a> [load\_balancers](#output\_load\_balancers) | The ARNs (Amazon Resource Name) of the load balancers associated with the target group. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the target group. |
-| <a name="output_port"></a> [port](#output\_port) | The port number on which the target receive trrafic. |
+| <a name="output_port"></a> [port](#output\_port) | The port number on which targets receive traffic. |
 | <a name="output_protocol"></a> [protocol](#output\_protocol) | The protocol to use to connect with the target. |
 | <a name="output_protocol_version"></a> [protocol\_version](#output\_protocol\_version) | The protocol version to use to send requests to targets. |
 | <a name="output_region"></a> [region](#output\_region) | The AWS region this module resources resides in. |

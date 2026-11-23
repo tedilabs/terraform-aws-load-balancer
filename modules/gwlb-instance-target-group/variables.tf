@@ -92,7 +92,7 @@ variable "health_check" {
     (Optional) `port` - The port the load balancer uses when performing health checks on targets. The default is the port on which each target receives traffic from the load balancer. Valid values are either ports 1-65535.
     (Optional) `port_override` - Whether to override the port on which each target receives traffic from the load balancer to a different port. Defaults to `false`.
     (Optional) `path` - The ping path for the HTTP or HTTPS protocol. Defaults to `/`. A path can have a maximum of 1024 characters.
-    (Optional) `success_codes` - The HTTP codes to use when checking for a successful response from a target for the HTTP or HTPS protocol. You can specify multiple values (for example, `200,202`) or a range of values (for example, `200-299`). Defaults to `200-399`.
+    (Optional) `success_codes` - The HTTP codes to use when checking for a successful response from a target for the HTTP or HTTPS protocol. You can specify multiple values (for example, `200,202`) or a range of values (for example, `200-299`). Defaults to `200-399`.
     (Optional) `healthy_threshold` - The number of consecutive health checks successes required before considering an unhealthy target healthy. Valid value range is 2 - 10. Defaults to `5`.
     (Optional) `unhealthy_threshold` - The number of consecutive health check failures required before considering a target unhealthy. Valid value range is 2 - 10. Defaults to `2`.
     (Optional) `interval` - Approximate amount of time, in seconds, between health checks of an individual target. Valid value range is 5 - 300. Defaults to `30`.
