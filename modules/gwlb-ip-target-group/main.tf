@@ -57,7 +57,6 @@ locals {
 # - `protocol_version`
 # - `proxy_protocol_v2`
 # - `slow_start`
-# - `stickiness`
 # - `target_control_port`
 # - `target_group_health`
 # - `target_health_state`
