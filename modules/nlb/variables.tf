@@ -175,7 +175,6 @@ variable "route53_resolver_availability_zone_affinity" {
     `ANY` - Client DNS queries will resolve to healthy load balancer IP addresses across all load balancer Availability Zones.
     `PARTIAL` - 85% of client DNS queries will favor load balancer IP addresses in their own Availability Zone. The remaining queries will resolve to any zone. Resolving to any zone may also occur if there are no healthy load balancer IP addresses in the client's zone.
     `ALL` - Client DNS queries will favor load balancer IP addresses in their own Availability Zone. Queries may resolve to other zones if there are no healthy load balancer IP addresses in their own zone.
-  balancer Availability Zones.
   EOF
   type        = string
   default     = "ANY"
@@ -247,7 +246,7 @@ variable "tags" {
 }
 
 variable "module_tags_enabled" {
-  description = "(Optional) Whether to create AWS Resource Tags for the module informations."
+  description = "(Optional) Whether to create AWS Resource Tags for the module information."
   type        = bool
   default     = true
   nullable    = false
