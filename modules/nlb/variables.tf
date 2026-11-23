@@ -86,8 +86,8 @@ variable "default_security_group" {
       (Optional) `ipv4_cidrs` - The IPv4 network ranges to allow, in CIDR notation.
       (Optional) `ipv6_cidrs` - The IPv6 network ranges to allow, in CIDR notation.
       (Optional) `prefix_lists` - The prefix list IDs to allow.
-      (Optional) `security_groups` - The source security group IDs to allow.
-      (Optional) `self` - Whether the security group itself will be added as a source to this ingress rule.
+      (Optional) `security_groups` - The destination security group IDs to allow.
+      (Optional) `self` - Whether the security group itself will be added as a destination to this egress rule.
     (Optional) `listener_ingress_ipv4_cidrs` - A list of IPv4 CIDR ranges to allow on the listener port. Defaults to `[]`."
     (Optional) `listener_ingress_ipv6_cidrs` - A list of IPv6 CIDR ranges to allow on the listener port. Defaults to `[]`."
     (Optional) `listener_ingress_prefix_lists` - A list of prefix list IDs for AWS services to allow on the listener port. Defaults to `[]`."
