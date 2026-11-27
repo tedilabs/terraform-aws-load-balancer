@@ -42,7 +42,7 @@ The `waf_fail_open_enabled` input has moved to `waf.fail_open_enabled`. The `att
 | ---- | ------ | ------- |
 | <a name="module_listener"></a> [listener](#module\_listener) | ../alb-listener | n/a |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | tedilabs/misc/aws//modules/resource-group | ~> 0.13.0 |
-| <a name="module_security_group"></a> [security\_group](#module\_security\_group) | tedilabs/network/aws//modules/security-group | ~> 1.3.0 |
+| <a name="module_security_group"></a> [security\_group](#module\_security\_group) | tedilabs/network/aws//modules/security-group | ~> 1.4.0 |
 
 ## Resources
 
